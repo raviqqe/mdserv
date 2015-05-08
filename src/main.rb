@@ -21,6 +21,27 @@ def doc_root
   ARGV[0] || Config::DOC_ROOT
 end
 
+def make_html_file body
+<<EOS
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <link rel="stylesheet" href="/style.css" type="text/css"/>
+  <!--
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
+  <link rel="icon" href="/favicon.ico" type="image/x-icon"/>
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" type="image/png"/>
+  -->
+  <meta name="viewport" content="width=device-width"/>
+</head>
+<body>
+#{body}
+</body>
+</html>
+EOS
+end
+
 # classes
 
 class MyMarkdown < String
@@ -53,8 +74,8 @@ s.mount_proc("/") do |req, res|
   end
 
   if filename =~ /\.html$/ or filename =~ /\.htm$/
-    res.body = MyMarkdown.new(open(filename.sub(/\.[^.]*$/, '.md')).read)
-        .to_html
+    res.body = make_html_file(MyMarkdown.new(open(filename.sub(/\.[^.]*$/,
+        '.md')).read).to_html)
   elsif filename =~ /\.md$/
     res.body = open(filename).read
     res.content_type = "text/plain"
