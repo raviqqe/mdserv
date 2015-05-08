@@ -36,9 +36,18 @@ def make_html_file body
   <meta name="viewport" content="width=device-width"/>
 </head>
 <body>
+<div>
 #{body}
+</div>
 </body>
 </html>
+EOS
+end
+
+def print_navi path
+<<EOS
+<p><a href="#{File.dirname(path)}">back</a></p>
+<hr/>
 EOS
 end
 
@@ -68,20 +77,39 @@ debug("DOC_ROOT = #{doc_root}")
 s = WEBrick::HTTPServer.new(:Port => Config::PORT,
     :DocumentRoot => doc_root)
 s.mount_proc("/") do |req, res|
-  filename = File.expand_path(File.join(doc_root, *req.path.split("/")))
-  if File.directory?(filename)
-    filename = File.join(filename, "index.html")
-  end
+  rel_path = req.path.sub(/\/index\.[^\/]*$/, "/")
+  rel_path = rel_path.empty? ? "/" : rel_path
+  abs_path = File.expand_path(File.join(doc_root, *rel_path.split("/")))
 
-  if filename =~ /\.html$/ or filename =~ /\.htm$/
-    res.body = make_html_file(MyMarkdown.new(open(filename.sub(/\.[^.]*$/,
-        '.md')).read).to_html)
-  elsif filename =~ /\.md$/
-    res.body = open(filename).read
+  res.body = print_navi rel_path
+
+  if File.directory?(abs_path)
+    res.body << <<EOS
+<h1>#{rel_path}</h1>
+<h2>Table of Contents</h2>
+<ul>
+EOS
+    (Dir.entries(abs_path) - [".", ".."]).each do |file|
+      file = file.sub(/\.md$/, ".html")
+      res.body << <<EOS
+<li><a href="#{File.join(rel_path, file)}"> #{file}</a></li>
+EOS
+    end
+    res.body << "</ul>"
+    res.content_type = "text/html"
+  elsif abs_path =~ /\.html$/ or abs_path =~ /\.htm$/
+    res.body << MyMarkdown.new(open(abs_path.sub(/\.[^.]*$/, '.md')).read)
+        .to_html
+    res.content_type = "text/html"
+  elsif abs_path =~ /\.md$/
+    res.body << open(abs_path).read
     res.content_type = "text/plain"
   else
+    res.body = print_navi("/") + "404 you are lost now"
     res.status = 404
   end
+
+  res.body = make_html_file(res.body)
 end
 
 trap("INT") {s.shutdown}
