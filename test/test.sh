@@ -1,4 +1,3 @@
 #!/bin/sh
 
-cd doc_root
-ruby ../../src/main.rb
+ruby ../src/main.rb doc_root
