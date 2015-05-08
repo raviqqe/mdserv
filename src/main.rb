@@ -17,6 +17,9 @@ def debug(x)
   puts x if DEBUG
 end
 
+def doc_root
+  ARGV[0] || Config::DOC_ROOT
+end
 
 # classes
 
@@ -39,12 +42,12 @@ end
 
 # main routine
 
-debug("DOC_ROOT = #{Config::DOC_ROOT}")
+debug("DOC_ROOT = #{doc_root}")
 
 s = WEBrick::HTTPServer.new(:Port => Config::PORT,
-    :DocumentRoot => ARGV[0] || Config::DOC_ROOT)
+    :DocumentRoot => doc_root)
 s.mount_proc("/") do |req, res|
-  filename = File.expand_path(File.join(Config::DOC_ROOT, *req.path.split("/")))
+  filename = File.expand_path(File.join(doc_root, *req.path.split("/")))
   if File.directory?(filename)
     filename = File.join(filename, "index.html")
   end
