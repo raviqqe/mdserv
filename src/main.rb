@@ -2,12 +2,14 @@
 
 require 'webrick'
 require 'redcarpet'
+require 'pathname'
 
-require_relative 'config'
 
 
 # global constants
 
+DOC_ROOT = Pathname.new(ARGV[0]).absolute? ? ARGV[0]
+    : File.expand_path(File.join(Dir.pwd, ARGV[0]))
 DEBUG = true
 
 
@@ -17,9 +19,6 @@ def debug(x)
   puts x if DEBUG
 end
 
-def doc_root
-  ARGV[0] || Config::DOC_ROOT
-end
 
 def make_html_file body
   base_dir="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5"
@@ -76,14 +75,16 @@ end
 
 # main routine
 
-debug("DOC_ROOT = #{doc_root}")
+debug("DOC_ROOT = #{DOC_ROOT}")
+Dir.chdir DOC_ROOT
+require File.join(Dir.pwd, "config.rb")
 
 s = WEBrick::HTTPServer.new(:Port => Config::PORT,
-    :DocumentRoot => doc_root)
+    :DocumentRoot => DOC_ROOT)
 s.mount_proc("/") do |req, res|
   rel_path = req.path.sub(/\/index\.[^\/]*$/, "/")
   rel_path = rel_path.empty? ? "/" : rel_path
-  abs_path = File.expand_path(File.join(doc_root, *rel_path.split("/")))
+  abs_path = File.expand_path(File.join(DOC_ROOT, *rel_path.split("/")))
 
   res.body = print_navi rel_path
 
@@ -94,10 +95,13 @@ s.mount_proc("/") do |req, res|
 <ul>
 EOS
     (Dir.entries(abs_path) - [".", ".."]).each do |file|
-      file = file.sub(/\.md$/, ".html")
-      res.body << <<EOS
+      if not defined? Config::INVALID_EXTS \
+          or not Config::INVALID_EXTS.include? File.extname(file)
+        file = file.sub(/\.md$/, ".html")
+        res.body << <<EOS
 <li><a href="#{File.join(rel_path, file)}"> #{file}</a></li>
 EOS
+      end
     end
     res.body << "</ul>"
     res.content_type = "text/html"
