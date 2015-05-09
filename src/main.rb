@@ -35,7 +35,7 @@ def make_html_file body
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" type="image/png"/>
   -->
   <meta name="viewport" content="width=device-width"/>
-  <link rel="stylesheet" href="#{base_dir}/styles/default.min.css"/>
+  <link rel="stylesheet" href="#{base_dir}/styles/rainbow.min.css"/>
   <script src="#{base_dir}/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script>
 </head>
