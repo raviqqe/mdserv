@@ -26,21 +26,24 @@ def make_html_file body
 <!DOCTYPE html>
 <html>
 <head>
-  <title></title>
-  <link rel="stylesheet" href="/style.css" type="text/css"/>
+  <title>
+    #{(defined? Config::TITLE) ? Config::TITLE : "give me a name"}
+  </title>
+  <meta name="viewport" content="width=device-width"/>
   <!--
   <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
   <link rel="icon" href="/favicon.ico" type="image/x-icon"/>
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" type="image/png"/>
   -->
-  <meta name="viewport" content="width=device-width"/>
-  <link rel="stylesheet" href="#{base_dir}/styles/rainbow.min.css"/>
+  #{(defined? Config::CSS) ? ('<link rel="stylesheet" href="' \
+      + Config::CSS + '" type="text/css"/>') : ""}
+  <link rel="stylesheet" href="#{base_dir}/styles/default.min.css"/>
   <script src="#{base_dir}/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script>
 </head>
 <body>
-<div>
-#{body}
+<div class="markdown-body">
+#{body + print_footer}
 </div>
 </body>
 </html>
@@ -52,6 +55,10 @@ def print_navi path
 <p><a href="#{File.dirname(path)}">back</a></p>
 <hr/>
 EOS
+end
+
+def print_footer
+  if defined? Config::FOOTER then open(Config::FOOTER).read else "" end
 end
 
 # classes
@@ -86,8 +93,6 @@ s.mount_proc("/") do |req, res|
   rel_path = rel_path.empty? ? "/" : rel_path
   abs_path = File.expand_path(File.join(DOC_ROOT, *rel_path.split("/")))
 
-  res.body = print_navi rel_path
-
   if File.directory?(abs_path)
     res.body << <<EOS
 <h1>#{rel_path}</h1>
@@ -104,20 +109,23 @@ EOS
       end
     end
     res.body << "</ul>"
+    res.body = make_html_file(print_navi(rel_path) + res.body)
     res.content_type = "text/html"
   elsif abs_path =~ /\.html$/ or abs_path =~ /\.htm$/
-    res.body << MyMarkdown.new(open(abs_path.sub(/\.[^.]*$/, '.md')).read)
-        .to_html
+    res.body << make_html_file(print_navi(rel_path) + MyMarkdown.new(
+        open(abs_path.sub(/\.[^.]*$/, '.md')).read).to_html)
     res.content_type = "text/html"
   elsif abs_path =~ /\.md$/
     res.body << open(abs_path).read
     res.content_type = "text/plain"
+  elsif abs_path =~ /\.css$/
+    res.body << open(abs_path).read
+    res.content_type = "text/css"
   else
     res.body = print_navi("/") + "404 you are lost now"
     res.status = 404
   end
 
-  res.body = make_html_file(res.body)
 end
 
 trap("INT") {s.shutdown}
