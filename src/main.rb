@@ -94,7 +94,7 @@ DOC_ROOT = Pathname.new(ARGV[0]).absolute? ? ARGV[0]
     : File.expand_path(File.join(Dir.pwd, ARGV[0]))
 
 debug("DOC_ROOT = #{DOC_ROOT}")
-debug("PORT = #{PORT}")
+debug("PORT = #{PORT}") if defined? PORT
 
 Dir.chdir DOC_ROOT
 require File.join(Dir.pwd, "config.rb")
