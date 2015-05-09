@@ -3,13 +3,11 @@
 require 'webrick'
 require 'redcarpet'
 require 'pathname'
-
+require 'optparse'
 
 
 # global constants
 
-DOC_ROOT = Pathname.new(ARGV[0]).absolute? ? ARGV[0]
-    : File.expand_path(File.join(Dir.pwd, ARGV[0]))
 DEBUG = true
 
 
@@ -82,11 +80,22 @@ end
 
 # main routine
 
+## parse command line arguments
+opt = OptionParser.new
+opt_args = {}
+opt.on('-p PORT_NUMBER') {|x| PORT = x}
+opt.parse!(ARGV)
+
+DOC_ROOT = Pathname.new(ARGV[0]).absolute? ? ARGV[0]
+    : File.expand_path(File.join(Dir.pwd, ARGV[0]))
+
 debug("DOC_ROOT = #{DOC_ROOT}")
+debug("PORT = #{PORT}")
+
 Dir.chdir DOC_ROOT
 require File.join(Dir.pwd, "config.rb")
 
-s = WEBrick::HTTPServer.new(:Port => Config::PORT,
+s = WEBrick::HTTPServer.new(:Port => defined?(PORT) ? PORT : 80,
     :DocumentRoot => DOC_ROOT)
 s.mount_proc("/") do |req, res|
   rel_path = req.path.sub(/\/index\.[^\/]*$/, "/")
