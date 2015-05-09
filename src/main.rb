@@ -31,13 +31,14 @@ def make_html_file body
     #{(defined? Config::TITLE) ? Config::TITLE : "give me a name"}
   </title>
   <meta name="viewport" content="width=device-width"/>
-  <!--
-  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
-  <link rel="icon" href="/favicon.ico" type="image/x-icon"/>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" type="image/png"/>
-  -->
-  #{(defined? Config::CSS) ? (Config::CSS.map \
-      {|path| next css_link(path)}).join : ""}
+  #{(defined? Config::ICON and Config::ICON) ?
+  '<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>' \
+  '<link rel="icon" href="/favicon.ico" type="image/x-icon"/>' : ""}
+  #{(defined? Config::PHONE_ICON and Config::PHONE_ICON) ?
+  '<link rel="apple-touch-icon" href="/apple-touch-icon.png" type="image/png"/>'
+  : ""}
+  #{(defined? Config::CSS) ?
+      (Config::CSS.map {|path| next css_link(path)}).join : ""}
   <link rel="stylesheet" href="#{base_dir}/styles/default.min.css"/>
   <script src="#{base_dir}/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script>
