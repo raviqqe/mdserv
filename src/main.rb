@@ -22,6 +22,7 @@ def doc_root
 end
 
 def make_html_file body
+  base_dir="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5"
 <<EOS
 <!DOCTYPE html>
 <html>
@@ -34,6 +35,9 @@ def make_html_file body
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" type="image/png"/>
   -->
   <meta name="viewport" content="width=device-width"/>
+  <link rel="stylesheet" href="#{base_dir}/styles/default.min.css"/>
+  <script src="#{base_dir}/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
 </head>
 <body>
 <div>
