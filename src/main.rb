@@ -106,18 +106,15 @@ s.mount_proc("/") do |req, res|
   abs_path = File.expand_path(File.join(DOC_ROOT, *rel_path.split("/")))
 
   if File.directory?(abs_path)
-    res.body << <<EOS
-<h1>#{rel_path}</h1>
-<h2>Table of Contents</h2>
-<ul>
-EOS
+    res.body << MyMarkdown.new(open(File.join(abs_path, "index.md")).read)
+        .to_html
+    res.body << "<h2>Table of Contents in #{rel_path}</h2><ul>"
     (Dir.entries(abs_path) - [".", ".."]).each do |file|
-      if not defined? Config::INVALID_EXTS \
-          or not Config::INVALID_EXTS.include? File.extname(file)
+      if not file =~ /index\.[^.\/]*$/ and (not defined? Config::VALID_EXTS \
+          or (Config::VALID_EXTS + ['.md', '']).include? File.extname(file))
         file = file.sub(/\.md$/, ".html")
-        res.body << <<EOS
-<li><a href="#{File.join(rel_path, file)}"> #{file}</a></li>
-EOS
+        res.body << "<li><a href=\"#{File.join(rel_path, file)}\">" \
+            "#{file}</a></li>"
       end
     end
     res.body << "</ul>"
@@ -125,7 +122,7 @@ EOS
     res.content_type = "text/html"
   elsif abs_path =~ /\.html$/ or abs_path =~ /\.htm$/
     res.body << make_html_file(print_navi(rel_path) + MyMarkdown.new(
-        open(abs_path.sub(/\.[^.]*$/, '.md')).read).to_html)
+        open(abs_path.sub(/\.[^.\/]*$/, '.md')).read).to_html)
     res.content_type = "text/html"
   elsif abs_path =~ /\.md$/
     res.body << open(abs_path).read
