@@ -17,6 +17,9 @@ def debug(x)
   puts x if DEBUG
 end
 
+def css_link href
+  "<link rel=\"stylesheet\" href=\"#{href}\" type=\"text/css\"/>"
+end
 
 def make_html_file body
   base_dir="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5"
@@ -33,8 +36,8 @@ def make_html_file body
   <link rel="icon" href="/favicon.ico" type="image/x-icon"/>
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" type="image/png"/>
   -->
-  #{(defined? Config::CSS) ? ('<link rel="stylesheet" href="' \
-      + Config::CSS + '" type="text/css"/>') : ""}
+  #{(defined? Config::CSS) ? (Config::CSS.map \
+      {|path| next css_link(path)}).join : ""}
   <link rel="stylesheet" href="#{base_dir}/styles/default.min.css"/>
   <script src="#{base_dir}/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script>
