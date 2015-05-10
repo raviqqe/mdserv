@@ -106,13 +106,15 @@ s.mount_proc("/") do |req, res|
   rel_path = rel_path.empty? ? "/" : rel_path
   abs_path = File.expand_path(File.join(DOC_ROOT, *rel_path.split("/")))
 
-  if File.directory?(abs_path)
+  if abs_path =~ /\/\./ or abs_path =~ /^\./
+  elsif File.directory?(abs_path)
     res.body << MyMarkdown.new(open(File.join(abs_path, "index.md")).read)
         .to_html
     res.body << "<h2>Table of Contents in #{rel_path}</h2><ul>"
     (Dir.entries(abs_path) - [".", ".."]).each do |file|
       if not file =~ /index\.[^.\/]*$/ and (not defined? Config::VALID_EXTS \
-          or (Config::VALID_EXTS + ['.md', '']).include? File.extname(file))
+          or (Config::VALID_EXTS + ['.md', '']).include? File.extname(file)) \
+          and not (file =~ /\/\./ or file =~ /^\./)
         file = file.sub(/\.md$/, ".html")
         res.body << "<li><a href=\"#{File.join(rel_path, file)}\">" \
             "#{file}</a></li>"
