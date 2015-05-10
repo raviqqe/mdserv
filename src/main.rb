@@ -9,6 +9,7 @@ require 'optparse'
 # global constants
 
 DEBUG = true
+INDEX_FILE = "index.md"
 
 
 # functions
@@ -64,6 +65,21 @@ def print_footer
   if defined? Config::FOOTER then open(Config::FOOTER).read else "" end
 end
 
+def get_md_title file
+  /^# *(.*)$/.match(open(file).read)[1]
+end
+
+def get_dir_title dir
+  if File.exist?(File.join(dir, INDEX_FILE))
+    get_md_title(File.join(dir, INDEX_FILE)).empty? ?
+        File.basename(dir, File.extname(dir))
+        : get_md_title(File.join(dir, INDEX_FILE))
+  else
+    File.basename(dir)
+  end
+end
+
+
 # classes
 
 class MyMarkdown < String
@@ -111,14 +127,17 @@ s.mount_proc("/") do |req, res|
   elsif File.directory?(abs_path)
     res.body << MyMarkdown.new(open(File.join(abs_path, "index.md")).read)
         .to_html
-    res.body << "<h2>Table of Contents in #{rel_path}</h2><ul>"
+    res.body << "<h2>Table of Contents</h2><ul>"
     (Dir.entries(abs_path) - [".", ".."]).each do |file|
-      if not file =~ /index\.[^.\/]*$/ and (not defined? Config::VALID_EXTS \
-          or (Config::VALID_EXTS + ['.md', '']).include? File.extname(file)) \
-          and not (file =~ /\/\./ or file =~ /^\./)
-        file = file.sub(/\.md$/, ".html")
+      if file =~ /index\.[^.\/]*$/ or file =~ /\/\./ or file =~ /^\./
+        next
+      elsif File.directory? file
         res.body << "<li><a href=\"#{File.join(rel_path, file)}\">" \
-            "#{file}</a></li>"
+            "#{get_dir_title(File.join(DOC_ROOT, rel_path, file))}</a></li>"
+      elsif file =~ /\.md$/
+        res.body << "<li><a href=\"#{File.join(rel_path, \
+            file.sub(/\.md$/, ".html"))}\">" \
+            "#{get_md_title(File.join(DOC_ROOT, rel_path, file))}</a></li>"
       end
     end
     res.body << "</ul>"
