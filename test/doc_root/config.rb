@@ -4,4 +4,5 @@ module Config
   FOOTER = "copy.html"
   VALID_EXTS = []
   ICON = "/favicon.ico"
+  PHONE_ICON = "/apple-touch-icon.png"
 end

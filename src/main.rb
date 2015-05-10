@@ -31,11 +31,12 @@ def make_html_file body
     #{(defined? Config::TITLE) ? Config::TITLE : "give me a name"}
   </title>
   <meta name="viewport" content="width=device-width"/>
-  #{(defined? Config::ICON and Config::ICON) ?
-  '<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>' \
-  '<link rel="icon" href="/favicon.ico" type="image/x-icon"/>' : ""}
-  #{(defined? Config::PHONE_ICON and Config::PHONE_ICON) ?
-  '<link rel="apple-touch-icon" href="/apple-touch-icon.png" type="image/png"/>'
+  #{(defined? Config::ICON and not Config::ICON.empty?) ?
+  "<link rel=\"shortcut icon\" href=\"#{Config::ICON}\" type=\"image/x-icon\"/>" \
+  "<link rel=\"icon\" href=\"#{Config::ICON}\" type=\"image/x-icon\"/>" : ""}
+  #{(defined? Config::PHONE_ICON and not Config::PHONE_ICON.empty?) ?
+  "<link rel=\"apple-touch-icon\" href=\"#{Config::PHONE_ICON}\"" \
+  " type=\"image/png\"/>"
   : ""}
   #{(defined? Config::CSS) ?
       (Config::CSS.map {|path| next css_link(path)}).join : ""}
