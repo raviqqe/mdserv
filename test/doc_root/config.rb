@@ -3,5 +3,5 @@ module Config
   CSS = ["/style.css"]
   FOOTER = "copy.html"
   VALID_EXTS = []
-  ICON = true
+  ICON = "/favicon.ico"
 end

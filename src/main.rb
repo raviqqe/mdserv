@@ -131,11 +131,19 @@ s.mount_proc("/") do |req, res|
   elsif abs_path =~ /\.css$/
     res.body << open(abs_path).read
     res.content_type = "text/css"
+  elsif abs_path =~ /\.ico$/
+    res.body << File.binread(abs_path)
+    res.content_type = "image/x-icon"
+  elsif abs_path =~ /\.png$/
+    res.body << File.binread(abs_path)
+    res.content_type = "image/png"
+  elsif abs_path =~ /\.jpeg$/ or abs_path =~ /\.jpg$/
+    res.body << File.binread(abs_path)
+    res.content_type = "image/jpeg"
   else
     res.body = print_navi("/") + "404 you are lost now"
     res.status = 404
   end
-
 end
 
 trap("INT") {s.shutdown}
