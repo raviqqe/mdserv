@@ -32,6 +32,7 @@ def make_html_file body
     #{(defined? Config::TITLE) ? Config::TITLE : "give me a name"}
   </title>
   <meta name="viewport" content="width=device-width"/>
+  <meta charset="utf-8"/>
   #{(defined? Config::ICON and not Config::ICON.empty?) ?
   "<link rel=\"shortcut icon\" href=\"#{Config::ICON}\" type=\"image/x-icon\"/>" \
   "<link rel=\"icon\" href=\"#{Config::ICON}\" type=\"image/x-icon\"/>" : ""}
