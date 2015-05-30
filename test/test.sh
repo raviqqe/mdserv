@@ -1,3 +1,3 @@
 #!/bin/sh
 
-ruby ../src/main.rb -p 8000 doc_root
+python3 ../src/main.py -p 8000 -d doc_root
