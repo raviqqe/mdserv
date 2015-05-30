@@ -232,19 +232,20 @@ def make_html(body):
   ret_str = """ <!DOCTYPE html>
       <html>
       <head>
-        <title>""" + (g_config["title"] if "title" in g_config else "") \
-        + """</title>
+        <title>""" + g_config["title"] + """</title>
         <meta name="viewport" content="width=device-width"/>
         <meta charset="utf-8"/>"""
-  ret_str += "\n".join(map(css_link, g_config["css"])) \
-              if "css" in g_config else ""
-  ret_str += ('<link rel="shortcut icon" href="{}" type="image/x-icon"/>'
-      '<link rel="icon" href="{}" type="image/x-icon"/>') \
-      .format(g_config["icon"], g_config["icon"]) \
-      if "icon" in g_config else ""
-  ret_str += '<link rel="apple-touch-icon" href="{}" type="image/png"/>' \
-      .format(g_config["phone_icon"]) \
-      if "phone_icon" in g_config else ""
+
+  if g_config["css"]:
+    ret_str += "\n".join(map(css_link, g_config["css"]))
+  if g_config["icon"]:
+    ret_str += ('<link rel="shortcut icon" href="{}" type="image/x-icon"/>'
+        '<link rel="icon" href="{}" type="image/x-icon"/>') \
+        .format(g_config["icon"], g_config["icon"])
+  if g_config["phone_icon"]:
+    ret_str += '<link rel="apple-touch-icon" href="{}" type="image/png"/>' \
+        .format(g_config["phone_icon"])
+
   ret_str += """<link rel="stylesheet" href=""" + '"' +  BASE_DIR \
         + """/styles/default.min.css"/>
         <script src=""" + '"' + BASE_DIR + """/highlight.min.js"></script>
