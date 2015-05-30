@@ -1,2 +1,3 @@
 # mdserv
-http server for markdown files written in ruby
+
+http server for markdown files written in python
