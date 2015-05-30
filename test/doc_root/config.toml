@@ -1,7 +1,7 @@
 title = "my homepage | this is test"
 css = ["/style.css"]
 footer = "copy.html"
-valid_exts = [".html", ".htm", ".md", ".py"]
+valid_exts = [".md", ".py", ".ico", ".png", ".jpeg", ".jpg"]
 icon = "/favicon.ico"
 phone_icon = "/apple-touch-icon.png"
-hidden_files = ["copy.html"]
+hidden_files = ["copy.html", "favicon.ico", "apple-touch-icon.png"]

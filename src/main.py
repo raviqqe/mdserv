@@ -61,6 +61,8 @@ class Config:
 
   def __init__(self, config_file):
     self.conf_dict = toml.load(config_file)
+    if ".md" in self.conf_dict["valid_exts"]:
+      self.conf_dict["valid_exts"] += [".html", ".htm"]
     debug("Config.__init__(): self.config = {}".format(self.conf_dict))
 
   def __getitem__(self, key):
@@ -157,7 +159,7 @@ def md2html(markdown_text):
 
 
 def css_link(href):
-  return '<link rel="stylesheet" href="{}" type="text/css"/>'.format(href)
+  return '<link rel="stylesheet" href="{}" type="text/css"/>\n'.format(href)
 
 
 def print_navi(path):
@@ -198,7 +200,6 @@ def is_valid_path(path):
   # path can be either relative or absolute
   return (os.path.splitext(path)[1] in g_config["valid_exts"]
       or os.path.isdir(path)) \
-      and not os.path.basename(path) in g_config["hidden_files"] \
       and not (re.match(r"^\.", path) or re.match(r"/\.", path))
 
 
@@ -209,8 +210,9 @@ def li_anchor(href, text):
 def print_table_of_contents(dir_path):
   assert os.path.isabs(dir_path)
   ret_str = "<h2>Table of Contents</h2><ul>"
-  for node in [x for x in os.listdir(dir_path)
-      if is_valid_path(x) and not re.match(r"index\.(md)|(html)|(htm)", x)]:
+  for node in [x for x in os.listdir(dir_path) if is_valid_path(x)
+      and not os.path.basename(x) in g_config["hidden_files"]
+      and not re.match(r"index\.(md)|(html)|(htm)", x)]:
     debug("print_table_of_contents(): " + "node = {}".format(node))
     REL_PATH = abs2rel(os.path.join(dir_path, node))
     EXT = os.path.splitext(node)[1]
@@ -234,16 +236,16 @@ def make_html(body):
       <head>
         <title>""" + g_config["title"] + """</title>
         <meta name="viewport" content="width=device-width"/>
-        <meta charset="utf-8"/>"""
+        <meta charset="utf-8"/>\n"""
 
   if g_config["css"]:
     ret_str += "\n".join(map(css_link, g_config["css"]))
   if g_config["icon"]:
-    ret_str += ('<link rel="shortcut icon" href="{}" type="image/x-icon"/>'
-        '<link rel="icon" href="{}" type="image/x-icon"/>') \
+    ret_str += ('<link rel="shortcut icon" href="{}" type="image/x-icon"/>\n'
+        '<link rel="icon" href="{}" type="image/x-icon"/>\n') \
         .format(g_config["icon"], g_config["icon"])
   if g_config["phone_icon"]:
-    ret_str += '<link rel="apple-touch-icon" href="{}" type="image/png"/>' \
+    ret_str += '<link rel="apple-touch-icon" href="{}" type="image/png"/>\n' \
         .format(g_config["phone_icon"])
 
   ret_str += """<link rel="stylesheet" href=""" + '"' +  BASE_DIR \
