@@ -2,6 +2,7 @@
 
 PREFIX = /usr/local
 BINDIR = ${PREFIX}/bin
+PROG_SRC = main.py
 PROG = ${BINDIR}/mdserv
 
 RM = rm -rf
@@ -9,11 +10,11 @@ RM = rm -rf
 all:
 	@echo nothing to do
 
-install: main.rb
-	install -m 755 main.rb ${PROG}
+install: ${PROG_SRC}
+	install -m 755 ${PROG_SRC} ${PROG}
 
 deinstall: uninstall
 uninstall:
 	${RM} ${PROG}
 
-.PHONY: all install deinstall uninstall
+.PHONY: all install deinstall uninstall clean
