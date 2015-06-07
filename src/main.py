@@ -9,6 +9,7 @@ import mistune
 import getopt
 import sys
 import re
+import codecs
 
 
 
@@ -117,19 +118,20 @@ class FileHandler(http.server.SimpleHTTPRequestHandler):
     try:
       self.write_header(ctype=self.guess_type(abs_path))
       if os.path.basename(abs_path) in {"index.html", "index.htm"}:
-        with open(change_ext2md(abs_path)) as f:
+        with open_txt(change_ext2md(abs_path)) as f:
           self.wfile.write(make_html(
               print_navi(os.path.dirname(abs2rel(abs_path)))
               + md2html(f.read())
               + print_table_of_contents(os.path.dirname(abs_path))
-              + print_footer()).encode())
+              + print_footer()).encode("utf-8"))
       elif EXT in {".html", "htm"} and not os.path.isfile(abs_path):
-        with open(change_ext2md(abs_path)) as f:
+        with open_txt(change_ext2md(abs_path)) as f:
           self.wfile.write(make_html(
               print_navi(abs2rel(abs_path))
                + md2html(f.read()) + print_footer()).encode())
       else: # include .md files
         with open(abs_path, 'rb') as f:
+          debug("type(f) = {}".format(type(f)))
           self.copyfile(f, self.wfile)
     except OSError:
       self.send_404()
@@ -170,16 +172,20 @@ def change_ext2md(path):
   return os.path.splitext(path)[0] + ".md"
 
 
+def open_txt(path, mode='r'):
+  return codecs.open(path, mode, encoding="utf-8")
+
+
 def print_footer():
   if "footer" in g_config:
-    with open(g_config["footer"]) as f:
+    with open_txt(g_config["footer"]) as f:
       return f.read()
   else:
     return ""
 
 
 def get_md_title(filename):
-  with open(filename) as f:
+  with open_txt(filename) as f:
     m = re.match(r"# *(.*)", f.read()) # somehow r"^# *(.*)$" doesn't work
     if m:
       return m.group(1)
