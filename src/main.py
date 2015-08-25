@@ -49,6 +49,7 @@ class Config:
   footer = "footer.html"
   valid_exts = [".md", ".py"]
   hidden_files = ["footer.html", "hidden.html"]
+  ```
   """
   defaults = {
     "title" : "",
@@ -75,7 +76,7 @@ class Config:
 
   def __contains__(self, key):
     return key in self.conf_dict
-    
+
 
 class FileHandler(http.server.SimpleHTTPRequestHandler):
   def do_GET(self):
