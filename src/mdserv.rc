@@ -22,16 +22,31 @@
 name="mdserv"
 rcvar=mdserv_enable
 load_rc_config $name
+pidprefix="/var/run/mdserv/mdserv"
+pidfile="${pidprefix}.pid"
 
-procname="/usr/local/bin/mdserv"
+procname="/usr/local/bin/python3"
+script="/usr/local/bin/mdserv"
 command="/usr/sbin/daemon"
+start_precmd="mdserv_precmd"
+stop_postcmd="mdserv_postcmd"
 
 mdserv_enable=${mdserv_enable:-"NO"}
 mdserv_user=${mdserv_user:-"nobody"}
 mdserv_port=${mdserv_port:-"8080"}
 mdserv_directory=${mdserv_directory:-"/nonexistent"}
 
-command_args="-f ${procname} -p ${mdserv_port} "\
+command_args="-p ${pidfile} ${procname} ${script} -p ${mdserv_port} "\
 "-d ${mdserv_directory}"
+
+mdserv_precmd()
+{
+  install -d -o root -g wheel -m 1777 /var/run/mdserv
+}
+
+mdserv_postcmd()
+{
+  rm -rf /var/run/mdserv
+}
 
 run_rc_command "$1"
