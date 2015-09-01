@@ -45,7 +45,7 @@ def error(*items):
 MD_EXTENSION = ".md"
 CONFIG_FILE = "config.toml"
 INDEX_MD = "index.md"
-UTF8 = "utf-8"
+ENCODING = "utf-8"
 
 
 
@@ -199,21 +199,21 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
       send_404()
 
   def send_index_md_file(self, md_file):
-    with open(md_file) as f:
+    with open(md_file, encoding=ENCODING) as f:
       self.wfile.write(HTML(HTMLContent(
           HTMLNavigation(os.path.dirname(abs2rel(md_file))),
           self.md2html(f.read()),
           HTMLTableOfContents(os.path.dirname(md_file)),
           HTMLElem(self.copyright(md_file))))
-          .to_str().encode(UTF8))
+          .to_str().encode(ENCODING))
 
   def send_md_file(self, md_file):
-    with open(md_file) as f:
+    with open(md_file, encoding=ENCODING) as f:
       self.wfile.write(HTML(HTMLContent(
           HTMLNavigation(os.path.dirname(abs2rel(md_file))),
           self.md2html(f.read()),
           HTMLElem(self.copyright(md_file))))
-          .to_str().encode(UTF8))
+          .to_str().encode(ENCODING))
 
   @staticmethod
   def md2html(markdown_text):
@@ -244,7 +244,7 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
       copyright_file = os.path.join(os.path.dirname(md_file),
                                     g_config["copyright"])
     if os.path.isfile(copyright_file):
-      with open(copyright_file) as f:
+      with open(copyright_file, encoding=ENCODING) as f:
         return f.read()
     else:
       return ""
@@ -341,9 +341,9 @@ class HTML:
   @staticmethod
   def reformat_html(html_text):
     return lxml.etree.tostring(lxml.html.fromstring(html_text),
-                               encoding=UTF8,
+                               encoding=ENCODING,
                                doctype="<!DOCTYPE html>",
-                               pretty_print=True).decode(UTF8)
+                               pretty_print=True).decode(ENCODING)
 
   @staticmethod
   def css_link(href):
@@ -360,7 +360,7 @@ def abs2rel(real_path):
 
 
 def get_md_title(md_file):
-  with open(md_file) as f:
+  with open(md_file, encoding=ENCODING) as f:
     # somehow "^# *(.*)$" doesn't work
     matched_text = re.match("# *(.*)", f.read())
     if matched_text:
