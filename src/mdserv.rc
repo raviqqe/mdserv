@@ -36,7 +36,7 @@ mdserv_user=${mdserv_user:-"nobody"}
 mdserv_port=${mdserv_port:-"8080"}
 mdserv_directory=${mdserv_directory:-"/nonexistent"}
 
-command_args="-p ${pidfile} ${procname} ${script} -p ${mdserv_port} "\
+command_args="-f -p ${pidfile} ${procname} ${script} -p ${mdserv_port} "\
 "-d ${mdserv_directory}"
 
 mdserv_precmd()
