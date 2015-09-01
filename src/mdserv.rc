@@ -1,0 +1,38 @@
+#!/bin/sh
+
+# mdserv rc script
+#
+# PROVIDE: mdserv
+# REQUIRE: LOGIN
+# KEYWORD: shutdown
+
+# Add the following to /etc/rc.conf[.local]
+# ($mdserv_args is not used)
+#
+# required variables:
+# mdserv_enable="YES"
+# mdserv_directory="/nonexistent"
+#
+# optional variables:
+# mdserv_port="8080"
+# mdserv_user="nobody"
+
+. /etc/rc.subr
+
+name="mdserv"
+rcvar=mdserv_enable
+load_rc_config $name
+pidfile="/var/run/mdserv.pid"
+
+procname="/usr/local/bin/mdserv"
+command="/usr/sbin/daemon"
+
+mdserv_enable=${mdserv_enable:-"NO"}
+mdserv_user=${mdserv_user:-"nobody"}
+mdserv_port=${mdserv_port:-"8080"}
+mdserv_directory=${mdserv_directory:-"/nonexistent"}
+
+command_args="-f -p ${pidfile} ${procname} -p ${mdserv_port} "\
+"-d ${mdserv_directory}"
+
+run_rc_command "$1"
