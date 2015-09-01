@@ -22,7 +22,6 @@
 name="mdserv"
 rcvar=mdserv_enable
 load_rc_config $name
-pidfile="/var/run/mdserv.pid"
 
 procname="/usr/local/bin/mdserv"
 command="/usr/sbin/daemon"
@@ -32,7 +31,7 @@ mdserv_user=${mdserv_user:-"nobody"}
 mdserv_port=${mdserv_port:-"8080"}
 mdserv_directory=${mdserv_directory:-"/nonexistent"}
 
-command_args="-f -p ${pidfile} ${procname} -p ${mdserv_port} "\
+command_args="-f ${procname} -p ${mdserv_port} "\
 "-d ${mdserv_directory}"
 
 run_rc_command "$1"
