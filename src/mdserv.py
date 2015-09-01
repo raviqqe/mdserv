@@ -278,7 +278,9 @@ class HTMLTableOfContents(HTMLElem):
     for absolute_path in [os.path.join(directory, path)
         for path in os.listdir(directory)
         if not re.match(re.escape(INDEX_MD), path)]:
-      if not is_hidden_doc_path(abs2rel(absolute_path)):
+      if not is_hidden_doc_path(abs2rel(absolute_path)) \
+          and not (os.path.isdir(absolute_path)
+          and not os.path.isfile(os.path.join(absolute_path, INDEX_MD))):
         extension = os.path.splitext(absolute_path)[1]
         if extension == MD_EXTENSION and os.path.isfile(absolute_path):
           title = get_md_title(absolute_path)
