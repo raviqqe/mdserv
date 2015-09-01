@@ -196,7 +196,7 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
       with open(real_path, "rb") as f:
         self.wfile.write(f.read())
     else:
-      send_404()
+      self.send_404()
 
   def send_index_md_file(self, md_file):
     with open(md_file, encoding=ENCODING) as f:
