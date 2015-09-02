@@ -281,8 +281,8 @@ class HTMLTableOfContents(HTMLElem):
       if not is_hidden_doc_path(abs2rel(absolute_path)) \
           and not (os.path.isdir(absolute_path)
           and not os.path.isfile(os.path.join(absolute_path, INDEX_MD))):
-        extension = os.path.splitext(absolute_path)[1]
-        if extension == MD_EXTENSION and os.path.isfile(absolute_path):
+        if os.path.splitext(absolute_path)[1] == MD_EXTENSION \
+            and os.path.isfile(absolute_path):
           title = get_md_title(absolute_path)
           self.text += self.anchor_in_list_elem(abs2rel(absolute_path),
                                                 title if title else
@@ -304,9 +304,9 @@ class HTMLTableOfContents(HTMLElem):
 
 
 class HTMLNavigation(HTMLElem):
-  def __init__(self, doc_path):
+  def __init__(self, parent_directory_path):
     self.text = '<p><a href="{}">back</a></p><hr/>' \
-                .format(os.path.dirname(doc_path))
+                .format(parent_directory_path)
 
 
 class HTML:
