@@ -299,7 +299,8 @@ class HTMLTableOfContents(HTMLElem):
 class HTMLNavigation(HTMLElem):
   def __init__(self, parent_directory_path):
     self.text = '<p><a href="{}">back</a></p><hr/>' \
-                .format(re.match(r".*[^/]", parent_directory_path).group(0))
+                .format(re.match(r"(/)|(.*[^/])",
+                        parent_directory_path).group(0))
 
 
 class HTML:
