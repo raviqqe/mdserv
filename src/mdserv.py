@@ -185,14 +185,16 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
     assert os.path.isabs(real_path)
     assert is_safe_doc_path(abs2rel(real_path))
 
-    self.send_complete_header(self.guess_type(real_path))
     if os.path.isdir(real_path) \
         and os.path.isfile(os.path.join(real_path, INDEX_MD)):
+      self.send_complete_header("text/html")
       self.send_index_md_file(os.path.join(real_path, INDEX_MD))
     elif os.path.splitext(real_path)[1] == MD_EXTENSION \
         and os.path.isfile(real_path):
+      self.send_complete_header("text/html")
       self.send_md_file(real_path)
     elif os.path.isfile(real_path):
+      self.send_complete_header(self.guess_type(real_path))
       with open(real_path, "rb") as f:
         self.wfile.write(f.read())
     else:
@@ -276,7 +278,9 @@ class HTMLTableOfContents(HTMLElem):
     for absolute_path in [os.path.join(directory, path)
         for path in os.listdir(directory)
         if not re.match(re.escape(INDEX_MD), path)]:
-      if not is_hidden_doc_path(abs2rel(absolute_path)):
+      if not is_hidden_doc_path(abs2rel(absolute_path)) \
+          and not (os.path.isdir(absolute_path)
+          and not os.path.isfile(os.path.join(absolute_path, INDEX_MD))):
         extension = os.path.splitext(absolute_path)[1]
         if extension == MD_EXTENSION and os.path.isfile(absolute_path):
           title = get_md_title(absolute_path)
