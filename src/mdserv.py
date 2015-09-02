@@ -202,7 +202,7 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
   def send_index_md_file(self, md_file):
     with open_text_file(md_file) as f:
       self.wfile.write(HTML(HTMLContent(
-          HTMLNavigation(os.path.dirname(abs2rel(md_file))),
+          HTMLNavigation(os.path.dirname(os.path.dirname(abs2rel(md_file)))),
           md2html(f.read()),
           HTMLTableOfContents(os.path.dirname(md_file)),
           HTMLElem(self.copyright(md_file))))
@@ -299,8 +299,7 @@ class HTMLTableOfContents(HTMLElem):
 class HTMLNavigation(HTMLElem):
   def __init__(self, parent_directory_path):
     self.text = '<p><a href="{}">back</a></p><hr/>' \
-                .format(re.match(r"(/)|(.*[^/])",
-                        parent_directory_path).group(0))
+                .format(parent_directory_path)
 
 
 class HTML:
