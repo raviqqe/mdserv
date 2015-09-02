@@ -287,6 +287,10 @@ class HTMLTableOfContents(HTMLElem):
           self.text += self.anchor_in_list_elem(abs2rel(absolute_path),
                                                 title if title else
                                                 abs2rel(absolute_path))
+        elif os.path.isdir(absolute_path):
+          self.text += self.anchor_in_list_elem(
+              abs2rel(absolute_path),
+              get_directory_title(absolute_path))
         else:
           self.text += self.anchor_in_list_elem(abs2rel(absolute_path),
                                                 abs2rel(absolute_path))
@@ -389,9 +393,9 @@ def get_directory_title(directory):
   md_file = os.path.join(directory, INDEX_MD)
   if os.path.isfile(md_file):
     title = get_md_title(md_file)
-    return title if title else os.path.basename(abs2rel(directory))
+    return title if title else os.path.basename(directory)
   else:
-    return ""
+    return os.path.basename(directory)
 
 
 def is_safe_doc_path(path):
