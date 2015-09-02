@@ -204,7 +204,7 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
     with open_text_file(md_file) as f:
       self.wfile.write(HTML(HTMLContent(
           HTMLNavigation(os.path.dirname(abs2rel(md_file))),
-          self.md2html(f.read()),
+          md2html(f.read()),
           HTMLTableOfContents(os.path.dirname(md_file)),
           HTMLElem(self.copyright(md_file))))
           .to_str().encode(ENCODING))
@@ -213,15 +213,9 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
     with open_text_file(md_file) as f:
       self.wfile.write(HTML(HTMLContent(
           HTMLNavigation(os.path.dirname(abs2rel(md_file))),
-          self.md2html(f.read()),
+          md2html(f.read()),
           HTMLElem(self.copyright(md_file))))
           .to_str().encode(ENCODING))
-
-  @staticmethod
-  def md2html(markdown_text):
-    return HTMLElem(mistune.markdown(markdown_text,
-                                     escape=True,
-                                     use_xhtml=True))
 
   def send_complete_header(self, ctype):
     self.send_response(200)
@@ -360,6 +354,12 @@ class HTML:
 
 
 # functions
+
+def md2html(markdown_text):
+  return HTMLElem(mistune.markdown(markdown_text,
+                                   escape=True,
+                                   use_xhtml=True))
+
 
 def open_text_file(filename, mode="r"):
   return open(filename, mode=mode, encoding=ENCODING)
