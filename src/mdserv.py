@@ -199,7 +199,7 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
       self.send_404()
 
   def send_index_md_file(self, md_file):
-    with open(md_file, encoding=ENCODING) as f:
+    with open_text_file(md_file) as f:
       self.wfile.write(HTML(HTMLContent(
           HTMLNavigation(os.path.dirname(abs2rel(md_file))),
           self.md2html(f.read()),
@@ -208,7 +208,7 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
           .to_str().encode(ENCODING))
 
   def send_md_file(self, md_file):
-    with open(md_file, encoding=ENCODING) as f:
+    with open_text_file(md_file) as f:
       self.wfile.write(HTML(HTMLContent(
           HTMLNavigation(os.path.dirname(abs2rel(md_file))),
           self.md2html(f.read()),
@@ -244,7 +244,7 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
       copyright_file = os.path.join(os.path.dirname(md_file),
                                     g_config["copyright"])
     if os.path.isfile(copyright_file):
-      with open(copyright_file, encoding=ENCODING) as f:
+      with open_text_file(copyright_file) as f:
         return f.read()
     else:
       return ""
@@ -352,6 +352,10 @@ class HTML:
 
 # functions
 
+def open_text_file(filename, mode="r"):
+  return open(filename, mode=mode, encoding=ENCODING)
+
+
 def abs2rel(real_path):
   debug("abs2rel(): real_path =", real_path)
   doc_path = '/' + os.path.relpath(real_path, g_doc_root)
@@ -360,7 +364,7 @@ def abs2rel(real_path):
 
 
 def get_md_title(md_file):
-  with open(md_file, encoding=ENCODING) as f:
+  with open_text_file(md_file) as f:
     # somehow "^# *(.*)$" doesn't work
     matched_text = re.match("# *(.*)", f.read())
     if matched_text:
