@@ -292,8 +292,9 @@ class HTMLTableOfContents(HTMLElem):
               abs2rel(absolute_path),
               get_directory_title(absolute_path))
         else:
-          self.text += self.anchor_in_list_elem(abs2rel(absolute_path),
-                                                abs2rel(absolute_path))
+          self.text += self.anchor_in_list_elem(
+              abs2rel(absolute_path),
+              os.path.basename(absolute_path))
 
     self.text += "</ul>"
 
