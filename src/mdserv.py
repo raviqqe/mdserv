@@ -377,7 +377,7 @@ def get_md_title(md_file):
     # somehow "^# *(.*)$" doesn't work
     matched_text = re.match("# *(.*)", f.read())
     if matched_text:
-      return matched_text.group(1)
+      return md2html(matched_text.group(1)).to_str()
     else:
       info("get_md_title(): no md title found in {}".format(md_file))
       return ""
