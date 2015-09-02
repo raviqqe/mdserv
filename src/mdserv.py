@@ -9,7 +9,6 @@ import mistune
 import getopt
 import sys
 import re
-import codecs
 import lxml.etree
 import lxml.html
 import abc
