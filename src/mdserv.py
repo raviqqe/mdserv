@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import argparse
 import http.server
 import json
 import os
@@ -431,6 +432,24 @@ def load_json(filename):
     return json.load(file_)
 
 
+def check_args(args):
+  if not os.path.isdir(args.document_root):
+    raise FileNotFoundError("The document root directory, {} is not found."
+                            .format(args.document_root))
+
+  if not 0 <= args.port < 2 ** 16:
+    raise ValueError("Invalid port number: {}".format(args.port))
+
+
+def get_args():
+  arg_parser = argparse.ArgumentParser()
+  arg_parser.add_argument("-d", "--document-root", default=os.getcwd())
+  arg_parser.add_argument("-p", "--port", type=int, default=80)
+  args = arg_parser.parse_args()
+  check_args(args)
+  return args
+
+
 
 # main routine
 
@@ -438,27 +457,12 @@ def main(*args):
   global g_config
   global g_doc_root
 
+  args = get_args()
+
   g_config = Config()
-  g_doc_root = os.getcwd()
-  port = 80
+  g_doc_root = os.path.realpath(args.document_root)
 
-  opts, args = getopt.getopt(args, "d:p:")
-  for option, value in opts:
-    if option == "-d":
-      if os.path.isdir(value):
-        g_doc_root = os.path.realpath(value)
-      else:
-        error("document root directory, {} does not exist.".format(value))
-    elif option == "-p":
-      if value.isnumeric() and 0 <= int(value) <= 65535:
-        port = int(value)
-      else:
-        error("port number, {} is not an integer or not in range of "
-              "[0, 65535].".format(value))
   debug("main(): g_doc_root =", g_doc_root)
-
-  if len(args) > 0:
-    error("too many arguments.\nextra ones:", *args)
 
   config_filename = os.path.join(g_doc_root, CONFIG_FILE)
   if os.path.isfile(config_filename):
@@ -467,8 +471,7 @@ def main(*args):
     error("configuration file, '{}' not found in document root."
           .format(config_filename))
 
-  server = http.server.HTTPServer(('', port), FileHandler)
-  server.serve_forever()
+  http.server.HTTPServer(('', args.port), FileHandler).serve_forever()
 
 
 if __name__ == "__main__":
