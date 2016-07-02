@@ -41,9 +41,9 @@ def error(*items):
 
 # global constants
 
-MD_EXTENSION = ".md"
+MARKDOWN_EXT = ".md"
 CONFIG_FILE = "config.toml"
-INDEX_MD = "index.md"
+INDEX_FILE = "index" + MARKDOWN_EXT
 ENCODING = "utf-8"
 
 
@@ -103,11 +103,11 @@ class Config:
               "string.".format(key))
       self.config_dict[key] = value
 
-    if MD_EXTENSION in self.config_dict["valid_extensions"]:
+    if MARKDOWN_EXT in self.config_dict["valid_extensions"]:
       warn("'{}' is always included by mdserv as a valid extension. "
-           .format(MD_EXTENSION), "you don't need to add it explicitly.")
+           .format(MARKDOWN_EXT), "you don't need to add it explicitly.")
     else:
-      self.config_dict["valid_extensions"].append(MD_EXTENSION)
+      self.config_dict["valid_extensions"].append(MARKDOWN_EXT)
 
     self.set_valid_paths()
 
@@ -185,10 +185,10 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
     assert is_safe_doc_path(abs2rel(real_path))
 
     if os.path.isdir(real_path) \
-        and os.path.isfile(os.path.join(real_path, INDEX_MD)):
+        and os.path.isfile(os.path.join(real_path, INDEX_FILE)):
       self.send_complete_header("text/html")
-      self.send_index_md_file(os.path.join(real_path, INDEX_MD))
-    elif os.path.splitext(real_path)[1] == MD_EXTENSION \
+      self.send_index_md_file(os.path.join(real_path, INDEX_FILE))
+    elif os.path.splitext(real_path)[1] == MARKDOWN_EXT \
         and os.path.isfile(real_path):
       self.send_complete_header("text/html")
       self.send_md_file(real_path)
@@ -227,7 +227,7 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
   @staticmethod
   def guess_type(path):
     extension = os.path.splitext(path)[1]
-    if extension == MD_EXTENSION:
+    if extension == MARKDOWN_EXT:
       return "text/html"
     return mimetypes.guess_type(path)[0]
 
@@ -270,11 +270,11 @@ class HTMLTableOfContents(HTMLElem):
 
     for absolute_path in [os.path.join(directory, path)
         for path in os.listdir(directory)
-        if not re.match(re.escape(INDEX_MD), path)]:
+        if not re.match(re.escape(INDEX_FILE), path)]:
       if not is_hidden_doc_path(abs2rel(absolute_path)) \
           and not (os.path.isdir(absolute_path)
-          and not os.path.isfile(os.path.join(absolute_path, INDEX_MD))):
-        if os.path.splitext(absolute_path)[1] == MD_EXTENSION \
+          and not os.path.isfile(os.path.join(absolute_path, INDEX_FILE))):
+        if os.path.splitext(absolute_path)[1] == MARKDOWN_EXT \
             and os.path.isfile(absolute_path):
           title = get_md_title(absolute_path)
           self.text += self.anchor_in_list_elem(abs2rel(absolute_path),
@@ -385,13 +385,13 @@ def get_md_title(md_file):
 
 def get_directory_title(directory):
   """
-  Get the title of INDEX_MD file in the directory.
+  Get the title of INDEX_FILE file in the directory.
 
   The directory must be a absolute path.
   """
   assert os.path.isabs(directory)
 
-  md_file = os.path.join(directory, INDEX_MD)
+  md_file = os.path.join(directory, INDEX_FILE)
   if os.path.isfile(md_file):
     title = get_md_title(md_file)
     return title if title else os.path.basename(directory)
