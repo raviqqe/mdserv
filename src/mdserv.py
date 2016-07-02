@@ -70,11 +70,13 @@ class Config:
     "hidden_files" : [],
   }
 
-  def __init__(self, config_filename=None):
+  def __init__(self, document_root):
     self.config_dict = self.DEFAULT_CONFIG
 
-    if config_filename == None:
-      return
+    config_filename = os.path.join(document_root, CONFIG_FILE)
+    if not os.path.isfile(config_filename):
+      error("configuration file, '{}' not found in document root."
+            .format(config_filename))
 
     for key, value in load_json(config_filename).items():
       assert type(key) == str
@@ -463,17 +465,10 @@ def main(*args):
 
   args = get_args()
 
-  g_config = Config()
   g_doc_root = os.path.realpath(args.document_root)
+  g_config = Config(g_doc_root)
 
   debug("main(): g_doc_root =", g_doc_root)
-
-  config_filename = os.path.join(g_doc_root, CONFIG_FILE)
-  if os.path.isfile(config_filename):
-    g_config = Config(config_filename)
-  else:
-    error("configuration file, '{}' not found in document root."
-          .format(config_filename))
 
   serve(args.port)
 
