@@ -82,17 +82,17 @@ class Config:
     "hidden_files" : [],
   }
 
-  def __init__(self, config_file=None):
+  def __init__(self, config_filename=None):
     self.config_dict = self.DEFAULT_CONFIG_DICT
 
-    if config_file == None:
+    if config_filename == None:
       return
 
-    for key, value in toml.load(config_file).items():
+    for key, value in toml.load(config_filename).items():
       assert type(key) == str
       if key not in self.DEFAULT_CONFIG_DICT:
         warn("invalid item, '{}' detected in configuration file, '{}'."
-             .format(key, config_file))
+             .format(key, config_filename))
       elif type(self.DEFAULT_CONFIG_DICT[key]) == str \
            and not self.is_string(self.config_dict[key]):
         error("value of item, '{}' in configuration file must be string."
@@ -468,12 +468,12 @@ def main(*args):
   if len(args) > 0:
     error("too many arguments.\nextra ones:", *args)
 
-  config_file = os.path.join(g_doc_root, CONFIG_FILE)
-  if os.path.isfile(config_file):
-    g_config = Config(config_file)
+  config_filename = os.path.join(g_doc_root, CONFIG_FILE)
+  if os.path.isfile(config_filename):
+    g_config = Config(config_filename)
   else:
     error("configuration file, '{}' not found in document root."
-          .format(config_file))
+          .format(config_filename))
 
   server = http.server.HTTPServer(('', port), FileHandler)
   server.serve_forever()
