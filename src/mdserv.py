@@ -120,8 +120,8 @@ class Config:
         = {doc_path for doc_path in valid_doc_paths
           if not doc_path.startswith('/')}
 
-    debug(g_config["valid_absolute_doc_paths"])
-    debug(g_config["valid_doc_basenames"])
+    debug(self.config_dict["valid_absolute_doc_paths"])
+    debug(self.config_dict["valid_doc_basenames"])
 
   @staticmethod
   def is_list_of_string(list_of_string):
