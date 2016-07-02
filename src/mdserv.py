@@ -432,6 +432,10 @@ def load_json(filename):
     return json.load(file_)
 
 
+def serve(port):
+  http.server.HTTPServer(('', port), FileHandler).serve_forever()
+
+
 def check_args(args):
   if not os.path.isdir(args.document_root):
     raise FileNotFoundError("The document root directory, {} is not found."
@@ -471,7 +475,7 @@ def main(*args):
     error("configuration file, '{}' not found in document root."
           .format(config_filename))
 
-  http.server.HTTPServer(('', args.port), FileHandler).serve_forever()
+  serve(args.port)
 
 
 if __name__ == "__main__":
