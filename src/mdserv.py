@@ -1,10 +1,10 @@
 #!/usr/local/bin/python3
 
 import http.server
+import json
 import os
 import os.path
 import urllib.parse
-import toml
 import mistune
 import getopt
 import sys
@@ -42,7 +42,7 @@ def error(*items):
 # global constants
 
 MARKDOWN_EXT = ".md"
-CONFIG_FILE = "config.toml"
+CONFIG_FILE = "config.json"
 INDEX_FILE = "index" + MARKDOWN_EXT
 ENCODING = "utf-8"
 
@@ -59,7 +59,7 @@ g_doc_root = "/this/is/just/a/dummy/value" # dummy value
 
 class Config:
   """
-  example of configuration file in toml
+  example of configuration file in json
   ```
   title = "my title"
   css = ["/style.css", "style.css"]
@@ -88,7 +88,7 @@ class Config:
     if config_filename == None:
       return
 
-    for key, value in toml.load(config_filename).items():
+    for key, value in load_json(config_filename).items():
       assert type(key) == str
       if key not in self.DEFAULT_CONFIG_DICT:
         warn("invalid item, '{}' detected in configuration file, '{}'."
@@ -437,6 +437,11 @@ def is_hidden_doc_path(path):
     return True
   debug("is_hidden_doc_path(): passed path =", path)
   return False
+
+
+def load_json(filename):
+  with open(filename) as file_:
+    return json.load(file_)
 
 
 
