@@ -58,21 +58,8 @@ g_doc_root = "/this/is/just/a/dummy/value" # dummy value
 # classes
 
 class Config:
-  """
-  example of configuration file in json
-  ```
-  title = "my title"
-  css = ["/style.css", "style.css"]
-  icon = "/favicon.ico"
-  phone_icon = "/apple-touch-icon.png"
-  copyright = "/copyright.html"
-  valid_extensions = [".py"]
-  hidden_files = ["/copyright.html", "hidden.html"]
-  ```
-  """
-
   # every item must be evaluated as False by bool() method
-  DEFAULT_CONFIG_DICT = {
+  DEFAULT_CONFIG = {
     "title" : "",
     "css" : [],
     "icon" : "",
@@ -83,21 +70,21 @@ class Config:
   }
 
   def __init__(self, config_filename=None):
-    self.config_dict = self.DEFAULT_CONFIG_DICT
+    self.config_dict = self.DEFAULT_CONFIG
 
     if config_filename == None:
       return
 
     for key, value in load_json(config_filename).items():
       assert type(key) == str
-      if key not in self.DEFAULT_CONFIG_DICT:
+      if key not in self.DEFAULT_CONFIG:
         warn("invalid item, '{}' detected in configuration file, '{}'."
              .format(key, config_filename))
-      elif type(self.DEFAULT_CONFIG_DICT[key]) == str \
+      elif type(self.DEFAULT_CONFIG[key]) == str \
            and not self.is_string(self.config_dict[key]):
         error("value of item, '{}' in configuration file must be string."
               .format(key))
-      elif type(self.DEFAULT_CONFIG_DICT[key]) == list \
+      elif type(self.DEFAULT_CONFIG[key]) == list \
            and not self.is_list_of_string(self.config_dict[key]):
         error("value of item, '{}' in configuration file must be a list of "
               "string.".format(key))
