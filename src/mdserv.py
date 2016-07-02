@@ -42,10 +42,10 @@ def error(*items):
 
 # global constants
 
-MARKDOWN_EXT = ".md"
 CONFIG_FILE = "config.json"
-INDEX_FILE = "index" + MARKDOWN_EXT
 ENCODING = "utf-8"
+INDEX_FILE = "index" + MARKDOWN_EXT
+MARKDOWN_EXT = ".md"
 
 
 
