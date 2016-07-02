@@ -27,7 +27,7 @@ def debug(*items):
 def info(*items):
   print(*items, file=sys.stderr)
 
-def warning(*items):
+def warn(*items):
   if DEBUG:
     error(*items)
   else:
@@ -91,8 +91,8 @@ class Config:
     for key, value in toml.load(config_file).items():
       assert type(key) == str
       if key not in self.DEFAULT_CONFIG_DICT:
-        warning("invalid item, '{}' detected in configuration file, '{}'."
-                .format(key, config_file))
+        warn("invalid item, '{}' detected in configuration file, '{}'."
+             .format(key, config_file))
       elif type(self.DEFAULT_CONFIG_DICT[key]) == str \
            and not self.is_string(self.config_dict[key]):
         error("value of item, '{}' in configuration file must be string."
@@ -104,8 +104,8 @@ class Config:
       self.config_dict[key] = value
 
     if MD_EXTENSION in self.config_dict["valid_extensions"]:
-      warning("'{}' is always included by mdserv as a valid extension. "
-              .format(MD_EXTENSION), "you don't need to add it explicitly.")
+      warn("'{}' is always included by mdserv as a valid extension. "
+           .format(MD_EXTENSION), "you don't need to add it explicitly.")
     else:
       self.config_dict["valid_extensions"].append(MD_EXTENSION)
 
@@ -408,8 +408,8 @@ def is_safe_doc_path(path):
   The paths must be requested paths in HTTP headers.
   """
   if re.match(r"\.\.", path):
-    warning("directory tranersal attack detected in the request path, '{}'!"
-            .format(path))
+    warn("directory tranersal attack detected in the request path, '{}'!"
+         .format(path))
     return False
 
   if re.match(r"^\.[^/.]", path) or re.match(r"/\.[^/.]", path):
