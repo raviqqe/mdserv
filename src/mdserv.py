@@ -150,10 +150,13 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
       self._send_md_file(real_path)
     elif os.path.isfile(real_path):
       self._send_complete_header(self._guess_type(real_path))
-      with open(real_path, "rb") as file_:
-        self.wfile.write(file_.read())
+      self._send_other_file(real_path)
     else:
       self._send_404()
+
+  def _send_other_file(self, filename):
+    with open(filename, "rb") as file_:
+      self.wfile.write(file_.read())
 
   def _send_index_file(self, md_file):
     self.wfile.write(HTML(
