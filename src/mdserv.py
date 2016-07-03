@@ -84,7 +84,7 @@ class Config:
         warn("invalid item, '{}' detected in configuration file, '{}'."
              .format(key, config_filename))
       elif type(self.DEFAULT_CONFIG[key]) == str \
-           and not self.is_string(self.config_dict[key]):
+           and not isinstance(self.config_dict[key], str):
         error("value of item, '{}' in configuration file must be string."
               .format(key))
       elif type(self.DEFAULT_CONFIG[key]) == list \
@@ -132,10 +132,6 @@ class Config:
       return True
     else:
       return False
-
-  @staticmethod
-  def is_string(string):
-    return type(string) == str
 
 
 class FileHandler(http.server.BaseHTTPRequestHandler):
