@@ -260,7 +260,7 @@ class HTML:
                  '<meta charset="utf-8"/>'
 
     if CONFIG.css:
-      self._text += "\n".join(map(self.css_link, CONFIG.css))
+      self._text += "\n".join(map(self._css_link, CONFIG.css))
     if CONFIG.icon:
       self._text += '<link rel="shortcut icon" href="{}" type="image/x-icon"/>'\
                     '<link rel="icon" href="{}" type="image/x-icon"/>' \
@@ -280,30 +280,20 @@ class HTML:
                   '</div></body>' \
                   '</html>'
 
-    self._text = self.reformat_html(self._text)
-
   def to_str(self):
-    debug("HTML:to_str(): type(self._text) =", type(self._text))
-    return self._text
-
-  @staticmethod
-  def reformat_html(html_text):
-    return lxml.etree.tostring(lxml.html.fromstring(html_text),
+    return lxml.etree.tostring(lxml.html.fromstring(self._text),
                                encoding=ENCODING,
                                doctype="<!DOCTYPE html>",
                                pretty_print=True).decode(ENCODING)
 
   @staticmethod
-  def css_link(href):
+  def _css_link(href):
     return '<link rel="stylesheet" href="{}" type="text/css"/>'.format(href)
 
 
-# functions
 
 def md2html(markdown_text):
-  return HTMLElem(mistune.markdown(markdown_text,
-                                   escape=True,
-                                   use_xhtml=True))
+  return HTMLElem(mistune.markdown(markdown_text, escape=True, use_xhtml=True))
 
 
 def read_text_file(filename, mode="r"):
