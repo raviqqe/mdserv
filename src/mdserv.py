@@ -149,7 +149,7 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
       self._send_complete_header("text/html")
       self._send_md_file(real_path)
     elif os.path.isfile(real_path):
-      self._send_complete_header(self.guess_type(real_path))
+      self._send_complete_header(self._guess_type(real_path))
       with open(real_path, "rb") as file_:
         self.wfile.write(file_.read())
     else:
@@ -179,11 +179,11 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
     self.send_error(404, "I'm lost.")
 
   @staticmethod
-  def guess_type(path):
+  def _guess_type(path):
     extension = os.path.splitext(path)[1]
     if extension == MARKDOWN_EXT:
       return "text/html"
-    return mimetypes.guess_type(path)[0]
+    return mimetypes._guess_type(path)[0]
 
   @staticmethod
   def _copyright(md_file):
