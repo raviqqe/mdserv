@@ -79,7 +79,7 @@ class Config:
             .format(config_filename))
 
     for key, value in load_json(config_filename).items():
-      assert type(key) == str
+      assert isinstance(key, str)
       if key not in self.DEFAULT_CONFIG:
         warn("invalid item, '{}' detected in configuration file, '{}'."
              .format(key, config_filename))
