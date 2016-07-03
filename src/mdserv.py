@@ -88,7 +88,7 @@ class Config:
         error("value of item, '{}' in configuration file must be string."
               .format(key))
       elif isinstance(self.DEFAULT_CONFIG[key], list) \
-           and not self.is_list_of_string(self.config_dict[key]):
+           and not is_list_of_string(self.config_dict[key]):
         error("value of item, '{}' in configuration file must be a list of "
               "string.".format(key))
       self.config_dict[key] = value
@@ -122,16 +122,6 @@ class Config:
 
     debug(self.config_dict["valid_absolute_doc_paths"])
     debug(self.config_dict["valid_doc_basenames"])
-
-  @staticmethod
-  def is_list_of_string(list_of_string):
-    if isinstance(list_of_string, list):
-      for string in list_of_string:
-        if not isinstance(string, str):
-          return False
-      return True
-    else:
-      return False
 
 
 class FileHandler(http.server.BaseHTTPRequestHandler):
@@ -412,6 +402,17 @@ def is_safe_doc_path(path):
     debug("access to a file with invalid extenssion, '{}' is filtered "
           "in a request path, '{}'!".format(extension, path))
     return False
+  return True
+
+
+def is_list_of_string(list_of_string):
+  if not isinstance(list_of_string, list):
+    return False
+
+  for string in list_of_string:
+    if not isinstance(string, str):
+      return False
+
   return True
 
 
