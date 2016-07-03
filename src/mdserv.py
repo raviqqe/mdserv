@@ -165,10 +165,10 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
 
   def _send_md_file(self, md_file):
     self.wfile.write(HTML(HTMLContent(
-        HTMLNavigation(os.path.dirname(abs2rel(md_file))),
-        md2html(read_text_file(md_file)),
-        HTMLElem(self._copyright(md_file))))
-        .to_str().encode(ENCODING))
+      HTMLNavigation(os.path.dirname(abs2rel(md_file))),
+      md2html(read_text_file(md_file)),
+      HTMLElem(self._copyright(md_file))
+    )).to_str().encode(ENCODING))
 
   def _send_complete_header(self, ctype):
     self.send_response(200)
