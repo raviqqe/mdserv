@@ -180,8 +180,7 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
 
   @staticmethod
   def _guess_type(path):
-    extension = os.path.splitext(path)[1]
-    if extension == MARKDOWN_EXT:
+    if os.path.splitext(path)[1] == MARKDOWN_EXT:
       return "text/html"
     return mimetypes.guess_type(path)[0]
 
