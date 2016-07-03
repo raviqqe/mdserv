@@ -201,17 +201,17 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
 class HTMLElem:
   def __init__(self, text):
     assert isinstance(text, str)
-    self.text = text
+    self._text = text
 
   def to_str(self):
-    return self.text
+    return self._text
 
 
 class HTMLTableOfContents(HTMLElem):
   def __init__(self, directory):
     assert os.path.isabs(directory)
 
-    self.text = "<h2>Table of Contents</h2><ul>"
+    self._text = "<h2>Table of Contents</h2><ul>"
 
     for absolute_path in [os.path.join(directory, path)
         for path in os.listdir(directory)
@@ -222,19 +222,19 @@ class HTMLTableOfContents(HTMLElem):
         if os.path.splitext(absolute_path)[1] == MARKDOWN_EXT \
             and os.path.isfile(absolute_path):
           title = get_md_title(absolute_path)
-          self.text += self.anchor_in_list_elem(abs2rel(absolute_path),
-                                                title if title else
-                                                abs2rel(absolute_path))
+          self._text += self.anchor_in_list_elem(abs2rel(absolute_path),
+                                                 title if title else
+                                                 abs2rel(absolute_path))
         elif os.path.isdir(absolute_path):
-          self.text += self.anchor_in_list_elem(
+          self._text += self.anchor_in_list_elem(
               abs2rel(absolute_path),
               get_directory_title(absolute_path))
         else:
-          self.text += self.anchor_in_list_elem(
+          self._text += self.anchor_in_list_elem(
               abs2rel(absolute_path),
               os.path.basename(absolute_path))
 
-    self.text += "</ul>"
+    self._text += "</ul>"
 
   @staticmethod
   def anchor_in_list_elem(href, name):
@@ -243,8 +243,8 @@ class HTMLTableOfContents(HTMLElem):
 
 class HTMLNavigation(HTMLElem):
   def __init__(self, parent_directory_path):
-    self.text = '<p><a href="{}">back</a></p><hr/>' \
-                .format(parent_directory_path)
+    self._text = '<p><a href="{}">back</a></p><hr/>' \
+                 .format(parent_directory_path)
 
 
 class HTML:
@@ -254,37 +254,37 @@ class HTML:
   def __init__(self, *elems):
     assert all(isinstance(elem, HTMLElem) for elem in elems)
 
-    self.text = '<!DOCTYPE html><html><head>' \
-                '<title>' + CONFIG.title + '</title>' \
-                '<meta name="viewport" content="width=device-width"/>' \
-                '<meta charset="utf-8"/>'
+    self._text = '<!DOCTYPE html><html><head>' \
+                 '<title>' + CONFIG.title + '</title>' \
+                 '<meta name="viewport" content="width=device-width"/>' \
+                 '<meta charset="utf-8"/>'
 
     if CONFIG.css:
-      self.text += "\n".join(map(self.css_link, CONFIG.css))
+      self._text += "\n".join(map(self.css_link, CONFIG.css))
     if CONFIG.icon:
-      self.text += '<link rel="shortcut icon" href="{}" type="image/x-icon"/>'\
-                   '<link rel="icon" href="{}" type="image/x-icon"/>' \
-                   .format(CONFIG.icon, CONFIG.icon)
+      self._text += '<link rel="shortcut icon" href="{}" type="image/x-icon"/>'\
+                    '<link rel="icon" href="{}" type="image/x-icon"/>' \
+                    .format(CONFIG.icon, CONFIG.icon)
     if CONFIG.phone_icon:
-      self.text += '<link rel="apple-touch-icon" href="{}" type="image/png"/>'\
-                   .format(CONFIG.phone_icon)
+      self._text += '<link rel="apple-touch-icon" href="{}" type="image/png"/>'\
+                    .format(CONFIG.phone_icon)
 
     BASE_DIR = "//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5"
-    self.text += '<link rel="stylesheet" href="' +  BASE_DIR + \
-                 'styles/default.min.css"/>' \
-                 '<script src="' + BASE_DIR + 'highlight.min.js"></script>' \
-                 '<script>hljs.initHighlightingOnLoad();</script>' \
-                 '</head>' \
-                 '<body><div class="markdown-body">' \
-                 + "".join(elem.to_str() for elem in elems) + \
-                 '</div></body>' \
-                 '</html>'
+    self._text += '<link rel="stylesheet" href="' +  BASE_DIR + \
+                  'styles/default.min.css"/>' \
+                  '<script src="' + BASE_DIR + 'highlight.min.js"></script>' \
+                  '<script>hljs.initHighlightingOnLoad();</script>' \
+                  '</head>' \
+                  '<body><div class="markdown-body">' \
+                  + "".join(elem.to_str() for elem in elems) + \
+                  '</div></body>' \
+                  '</html>'
 
-    self.text = self.reformat_html(self.text)
+    self._text = self.reformat_html(self._text)
 
   def to_str(self):
-    debug("HTML:to_str(): type(self.text) =", type(self.text))
-    return self.text
+    debug("HTML:to_str(): type(self._text) =", type(self._text))
+    return self._text
 
   @staticmethod
   def reformat_html(html_text):
