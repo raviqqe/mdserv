@@ -214,17 +214,17 @@ class HTMLTableOfContents(HTMLElem):
     self._text = "<h2>Table of Contents</h2><ul>"
 
     for absolute_path in [os.path.join(directory, path)
-        for path in os.listdir(directory)
-        if not re.match(re.escape(INDEX_FILE), path)]:
+                          for path in os.listdir(directory)
+                          if not re.match(re.escape(INDEX_FILE), path)]:
       if not is_hidden_doc_path(abs2rel(absolute_path)) \
-          and not (os.path.isdir(absolute_path)
-          and not os.path.isfile(os.path.join(absolute_path, INDEX_FILE))):
+         and not (os.path.isdir(absolute_path)
+                  and not os.path.isfile(os.path.join(absolute_path,
+                                                      INDEX_FILE))):
         if os.path.splitext(absolute_path)[1] == MARKDOWN_EXT \
             and os.path.isfile(absolute_path):
-          title = get_md_title(absolute_path)
-          self._text += self.anchor_in_list_elem(abs2rel(absolute_path),
-                                                 title if title else
-                                                 abs2rel(absolute_path))
+          self._text += self.anchor_in_list_elem(
+              abs2rel(absolute_path),
+              get_md_title(absolute_path) or os.path.basename(absolute_path))
         elif os.path.isdir(absolute_path):
           self._text += self.anchor_in_list_elem(
               abs2rel(absolute_path),
