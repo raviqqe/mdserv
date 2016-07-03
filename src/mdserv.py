@@ -70,15 +70,19 @@ class Config:
     "hidden_files" : [],
   }
 
-  def __init__(self, document_root):
+  @staticmethod
+  def _load_config_file(document_root):
     config_filename = os.path.join(document_root, CONFIG_FILE)
     if not os.path.isfile(config_filename):
       error("configuration file, '{}' not found in document root."
             .format(config_filename))
 
+    return load_json(config_filename)
+
+  def __init__(self, document_root):
     self.config_dict = self.DEFAULT_CONFIG
 
-    for key, value in load_json(config_filename).items():
+    for key, value in self._load_config_file(document_root).items():
       assert isinstance(key, str)
       if key not in self.DEFAULT_CONFIG:
         warn("invalid item, '{}' detected in configuration file, '{}'."
@@ -93,11 +97,7 @@ class Config:
               "string.".format(key))
       self.config_dict[key] = value
 
-    if MARKDOWN_EXT in self.config_dict["valid_extensions"]:
-      warn("'{}' is always included by mdserv as a valid extension. "
-           .format(MARKDOWN_EXT), "you don't need to add it explicitly.")
-    else:
-      self.config_dict["valid_extensions"].append(MARKDOWN_EXT)
+    self.valid_extensions.append(MARKDOWN_EXT)
 
     debug(self.valid_absolute_doc_paths)
     debug(self.valid_doc_basenames)
