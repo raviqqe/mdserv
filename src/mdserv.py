@@ -130,14 +130,11 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
       self.send_404()
       return
 
-    if os.path.isdir(real_path):
-      parts = urllib.parse.urlsplit(self.path)
-      if not parts.path.endswith('/'):
-        self.send_response(301) # Moved Permanently
-        self.send_header("Location", urllib.parse.urlunsplit(
-            (parts[0], parts[1], parts[2] + '/', parts[3], parts[4])))
-        self.end_headers()
-        return
+    if os.path.isdir(real_path) and not self.path.endswith('/'):
+      self.send_response(301) # Moved Permanently
+      self.send_header("Location", self.path + "/")
+      self.end_headers()
+      return
 
     self.send_reply(real_path)
 
