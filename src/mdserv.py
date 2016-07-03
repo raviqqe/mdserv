@@ -186,10 +186,9 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
 
   @staticmethod
   def _copyright(md_file):
-    if os.path.isabs(CONFIG.copyright):
-      copyright_file = os.path.join(DOCUMENT_ROOT, CONFIG.copyright[1:])
-    else:
-      copyright_file = os.path.join(os.path.dirname(md_file), CONFIG.copyright)
+    copyright_file = os.path.join(DOCUMENT_ROOT, CONFIG.copyright[1:]) \
+                     if os.path.isabs(CONFIG.copyright) else \
+                     os.path.join(os.path.dirname(md_file), CONFIG.copyright)
 
     if os.path.isfile(copyright_file):
       return read_text_file(copyright_file)
