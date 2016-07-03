@@ -452,10 +452,7 @@ def get_args():
   return args
 
 
-
-# main routine
-
-def main(*args):
+def main():
   global g_config
   global g_doc_root
 
@@ -470,4 +467,4 @@ def main(*args):
 
 
 if __name__ == "__main__":
-  main(*sys.argv[1:])
+  main()
