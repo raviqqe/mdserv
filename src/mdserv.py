@@ -51,8 +51,8 @@ INDEX_FILE = "index" + MARKDOWN_EXT
 
 # global variables
 
-g_config = None # dummy value
-g_doc_root = "/this/is/just/a/dummy/value" # dummy value
+CONFIG = None # dummy value
+DOCUMENT_ROOT = "/this/is/just/a/dummy/value" # dummy value
 
 
 
@@ -135,7 +135,7 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
       return
 
     assert self.path.startswith('/')
-    real_path = os.path.join(g_doc_root, self.path[1:])
+    real_path = os.path.join(DOCUMENT_ROOT, self.path[1:])
     debug("requested real path = {}".format(real_path))
     if not os.path.exists(real_path):
       self.send_404()
@@ -208,11 +208,11 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
 
   @staticmethod
   def copyright(md_file):
-    if os.path.isabs(g_config.copyright):
-      copyright_file = os.path.join(g_doc_root, g_config.copyright[1:])
+    if os.path.isabs(CONFIG.copyright):
+      copyright_file = os.path.join(DOCUMENT_ROOT, CONFIG.copyright[1:])
     else:
       copyright_file = os.path.join(os.path.dirname(md_file),
-                                    g_config.copyright)
+                                    CONFIG.copyright)
     if os.path.isfile(copyright_file):
       with open_text_file(copyright_file) as f:
         return f.read()
@@ -285,19 +285,19 @@ class HTML:
     assert isinstance(content, HTMLContent)
 
     self.text = '<!DOCTYPE html><html><head>' \
-                '<title>' + g_config.title + '</title>' \
+                '<title>' + CONFIG.title + '</title>' \
                 '<meta name="viewport" content="width=device-width"/>' \
                 '<meta charset="utf-8"/>'
 
-    if g_config.css:
-      self.text += "\n".join(map(self.css_link, g_config.css))
-    if g_config.icon:
+    if CONFIG.css:
+      self.text += "\n".join(map(self.css_link, CONFIG.css))
+    if CONFIG.icon:
       self.text += '<link rel="shortcut icon" href="{}" type="image/x-icon"/>'\
                    '<link rel="icon" href="{}" type="image/x-icon"/>' \
-                   .format(g_config.icon, g_config.icon)
-    if g_config.phone_icon:
+                   .format(CONFIG.icon, CONFIG.icon)
+    if CONFIG.phone_icon:
       self.text += '<link rel="apple-touch-icon" href="{}" type="image/png"/>'\
-                   .format(g_config.phone_icon)
+                   .format(CONFIG.phone_icon)
 
     BASE_DIR = "//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5"
     self.text += '<link rel="stylesheet" href="' +  BASE_DIR + \
@@ -341,7 +341,7 @@ def open_text_file(filename, mode="r"):
 
 def abs2rel(real_path):
   debug("abs2rel(): real_path =", real_path)
-  doc_path = '/' + os.path.relpath(real_path, g_doc_root)
+  doc_path = '/' + os.path.relpath(real_path, DOCUMENT_ROOT)
   debug("abs2rel(): doc_path =", doc_path)
   return doc_path
 
@@ -392,12 +392,12 @@ def is_safe_doc_path(path):
           "'{}'.".format(path))
     return False
 
-  if path in g_config.valid_absolute_doc_paths \
-      or os.path.basename(path) in g_config.valid_doc_basenames:
+  if path in CONFIG.valid_absolute_doc_paths \
+      or os.path.basename(path) in CONFIG.valid_doc_basenames:
     return True
 
   extension = os.path.splitext(path)[1]
-  if extension != "" and extension not in g_config.valid_extensions:
+  if extension != "" and extension not in CONFIG.valid_extensions:
     debug("access to a file with invalid extenssion, '{}' is filtered "
           "in a request path, '{}'!".format(extension, path))
     return False
@@ -418,8 +418,8 @@ def is_list_of_string(list_of_string):
 def is_hidden_doc_path(path):
   if not is_safe_doc_path(path):
     return True
-  elif path in g_config.hidden_files \
-      or os.path.basename(path) in g_config.hidden_files:
+  elif path in CONFIG.hidden_files \
+      or os.path.basename(path) in CONFIG.hidden_files:
     return True
   debug("is_hidden_doc_path(): passed path =", path)
   return False
@@ -453,15 +453,15 @@ def get_args():
 
 
 def main():
-  global g_config
-  global g_doc_root
+  global CONFIG
+  global DOCUMENT_ROOT
 
   args = get_args()
 
-  g_doc_root = os.path.realpath(args.document_root)
-  g_config = Config(g_doc_root)
+  DOCUMENT_ROOT = os.path.realpath(args.document_root)
+  CONFIG = Config(DOCUMENT_ROOT)
 
-  debug("main(): g_doc_root =", g_doc_root)
+  debug("DOCUMENT_ROOT =", DOCUMENT_ROOT)
 
   serve(args.port)
 
