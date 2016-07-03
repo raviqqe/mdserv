@@ -144,8 +144,7 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
     if os.path.isdir(real_path) and os.path.isfile(index_file):
       self._send_complete_header("text/html")
       self._send_index_file(index_file)
-    elif os.path.splitext(real_path)[1] == MARKDOWN_EXT \
-         and os.path.isfile(real_path):
+    elif is_markdown_file(real_path) and os.path.isfile(real_path):
       self._send_complete_header("text/html")
       self._send_md_file(real_path)
     elif os.path.isfile(real_path):
@@ -183,9 +182,8 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
 
   @staticmethod
   def _guess_type(path):
-    if os.path.splitext(path)[1] == MARKDOWN_EXT:
-      return "text/html"
-    return mimetypes.guess_type(path)[0]
+    return "text/html" if is_markdown_file(path) else \
+           mimetypes.guess_type(path)[0]
 
   @staticmethod
   def _copyright(md_file):
@@ -220,8 +218,7 @@ class HTMLTableOfContents(HTMLElem):
          and not (os.path.isdir(absolute_path)
                   and not os.path.isfile(os.path.join(absolute_path,
                                                       INDEX_FILE))):
-        if os.path.splitext(absolute_path)[1] == MARKDOWN_EXT \
-            and os.path.isfile(absolute_path):
+        if is_markdown_file(absolute_path) and os.path.isfile(absolute_path):
           self._text += self.anchor_in_list_elem(
               abs2rel(absolute_path),
               get_md_title(absolute_path) or os.path.basename(absolute_path))
@@ -291,6 +288,13 @@ class HTML:
     return '<link rel="stylesheet" href="{}" type="text/css"/>'.format(href)
 
 
+def is_markdown_file(filename):
+  return file_extension(filename) == MARKDOWN_EXT
+
+
+def file_extension(filename):
+  return os.path.splitext(filename)[1]
+
 
 def md2html(markdown_text):
   return HTMLElem(mistune.markdown(markdown_text, escape=True, use_xhtml=True))
@@ -352,7 +356,7 @@ def is_safe_doc_path(path):
       or os.path.basename(path) in CONFIG.valid_doc_basenames:
     return True
 
-  extension = os.path.splitext(path)[1]
+  extension = file_extension(path)
   if extension != "" and extension not in CONFIG.valid_extensions:
     debug("access to a file with invalid extenssion, '{}' is filtered "
           "in a request path, '{}'!".format(extension, path))
