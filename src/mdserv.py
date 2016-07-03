@@ -71,12 +71,12 @@ class Config:
   }
 
   def __init__(self, document_root):
-    self.config_dict = self.DEFAULT_CONFIG
-
     config_filename = os.path.join(document_root, CONFIG_FILE)
     if not os.path.isfile(config_filename):
       error("configuration file, '{}' not found in document root."
             .format(config_filename))
+
+    self.config_dict = self.DEFAULT_CONFIG
 
     for key, value in load_json(config_filename).items():
       assert isinstance(key, str)
@@ -103,7 +103,7 @@ class Config:
 
     debug("Config.__init__(): self.config_dict = {}".format(self.config_dict))
 
-  def __getitem__(self, key):
+  def __getattr__(self, key):
     assert key in self.config_dict
     return self.config_dict[key]
 
@@ -209,11 +209,11 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
 
   @staticmethod
   def copyright(md_file):
-    if os.path.isabs(g_config["copyright"]):
-      copyright_file = os.path.join(g_doc_root, g_config["copyright"][1:])
+    if os.path.isabs(g_config.copyright):
+      copyright_file = os.path.join(g_doc_root, g_config.copyright[1:])
     else:
       copyright_file = os.path.join(os.path.dirname(md_file),
-                                    g_config["copyright"])
+                                    g_config.copyright)
     if os.path.isfile(copyright_file):
       with open_text_file(copyright_file) as f:
         return f.read()
@@ -286,19 +286,19 @@ class HTML:
     assert isinstance(content, HTMLContent)
 
     self.text = '<!DOCTYPE html><html><head>' \
-                '<title>' + g_config["title"] + '</title>' \
+                '<title>' + g_config.title + '</title>' \
                 '<meta name="viewport" content="width=device-width"/>' \
                 '<meta charset="utf-8"/>'
 
-    if g_config["css"]:
-      self.text += "\n".join(map(self.css_link, g_config["css"]))
-    if g_config["icon"]:
+    if g_config.css:
+      self.text += "\n".join(map(self.css_link, g_config.css))
+    if g_config.icon:
       self.text += '<link rel="shortcut icon" href="{}" type="image/x-icon"/>'\
                    '<link rel="icon" href="{}" type="image/x-icon"/>' \
-                   .format(g_config["icon"], g_config["icon"])
-    if g_config["phone_icon"]:
+                   .format(g_config.icon, g_config.icon)
+    if g_config.phone_icon:
       self.text += '<link rel="apple-touch-icon" href="{}" type="image/png"/>'\
-                   .format(g_config["phone_icon"])
+                   .format(g_config.phone_icon)
 
     BASE_DIR = "//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5"
     self.text += '<link rel="stylesheet" href="' +  BASE_DIR + \
@@ -393,12 +393,12 @@ def is_safe_doc_path(path):
           "'{}'.".format(path))
     return False
 
-  if path in g_config["valid_absolute_doc_paths"] \
-      or os.path.basename(path) in g_config["valid_doc_basenames"]:
+  if path in g_config.valid_absolute_doc_paths \
+      or os.path.basename(path) in g_config.valid_doc_basenames:
     return True
 
   extension = os.path.splitext(path)[1]
-  if extension != "" and extension not in g_config["valid_extensions"]:
+  if extension != "" and extension not in g_config.valid_extensions:
     debug("access to a file with invalid extenssion, '{}' is filtered "
           "in a request path, '{}'!".format(extension, path))
     return False
@@ -419,8 +419,8 @@ def is_list_of_string(list_of_string):
 def is_hidden_doc_path(path):
   if not is_safe_doc_path(path):
     return True
-  elif path in g_config["hidden_files"] \
-      or os.path.basename(path) in g_config["hidden_files"]:
+  elif path in g_config.hidden_files \
+      or os.path.basename(path) in g_config.hidden_files:
     return True
   debug("is_hidden_doc_path(): passed path =", path)
   return False
