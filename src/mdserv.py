@@ -44,8 +44,8 @@ def error(*items):
 
 CONFIG_FILE = "config.json"
 ENCODING = "utf-8"
-INDEX_FILE = "index" + MARKDOWN_EXT
 MARKDOWN_EXT = ".md"
+INDEX_FILE = "index" + MARKDOWN_EXT
 
 
 
