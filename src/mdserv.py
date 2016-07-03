@@ -337,10 +337,8 @@ def get_directory_title(directory):
 
   md_file = os.path.join(directory, INDEX_FILE)
   if os.path.isfile(md_file):
-    title = get_md_title(md_file)
-    return title if title else os.path.basename(directory)
-  else:
-    return os.path.basename(directory)
+    return get_md_title(md_file) or os.path.basename(directory)
+  return os.path.basename(directory)
 
 
 def is_safe_doc_path(path):
