@@ -36,7 +36,7 @@ def warn(*items):
 
 def error(*items):
   info("ERROR:", *items)
-  exit()
+  exit(1)
 
 
 
