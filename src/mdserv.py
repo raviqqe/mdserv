@@ -114,20 +114,17 @@ class Config:
 
 class FileHandler(http.server.BaseHTTPRequestHandler):
   def do_GET(self):
-    """
-    serve a GET request.
-    """
     debug("requested path =", self.path)
 
     if not is_safe_doc_path(self.path):
-      self.send_404()
+      self._send_404()
       return
 
     assert self.path.startswith('/')
     real_path = os.path.join(DOCUMENT_ROOT, self.path[1:])
     debug("requested real path = {}".format(real_path))
     if not os.path.exists(real_path):
-      self.send_404()
+      self._send_404()
       return
 
     if os.path.isdir(real_path) and not self.path.endswith('/'):
@@ -139,51 +136,46 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
     self._send_reply(real_path)
 
   def _send_reply(self, real_path):
-    """
-    send HTTP reply.
-    """
     assert os.path.isabs(real_path)
     assert is_safe_doc_path(abs2rel(real_path))
 
     index_file = os.path.join(real_path, INDEX_FILE)
 
     if os.path.isdir(real_path) and os.path.isfile(index_file):
-      self.send_complete_header("text/html")
-      self.send_index_md_file(index_file)
+      self._send_complete_header("text/html")
+      self._send_index_file(index_file)
     elif os.path.splitext(real_path)[1] == MARKDOWN_EXT \
          and os.path.isfile(real_path):
-      self.send_complete_header("text/html")
-      self.send_md_file(real_path)
+      self._send_complete_header("text/html")
+      self._send_md_file(real_path)
     elif os.path.isfile(real_path):
-      self.send_complete_header(self.guess_type(real_path))
+      self._send_complete_header(self.guess_type(real_path))
       with open(real_path, "rb") as file_:
         self.wfile.write(file_.read())
     else:
-      self.send_404()
+      self._send_404()
 
-  def send_index_md_file(self, md_file):
-    with open_text_file(md_file) as f:
-      self.wfile.write(HTML(HTMLContent(
-          HTMLNavigation(os.path.dirname(os.path.dirname(abs2rel(md_file)))),
-          md2html(f.read()),
-          HTMLTableOfContents(os.path.dirname(md_file)),
-          HTMLElem(self.copyright(md_file))))
-          .to_str().encode(ENCODING))
+  def _send_index_file(self, md_file):
+    self.wfile.write(HTML(HTMLContent(
+      HTMLNavigation(os.path.dirname(os.path.dirname(abs2rel(md_file)))),
+      md2html(read_text_file(md_file)),
+      HTMLTableOfContents(os.path.dirname(md_file)),
+      HTMLElem(self._copyright(md_file)),
+    )).to_str().encode(ENCODING))
 
-  def send_md_file(self, md_file):
-    with open_text_file(md_file) as f:
-      self.wfile.write(HTML(HTMLContent(
-          HTMLNavigation(os.path.dirname(abs2rel(md_file))),
-          md2html(f.read()),
-          HTMLElem(self.copyright(md_file))))
-          .to_str().encode(ENCODING))
+  def _send_md_file(self, md_file):
+    self.wfile.write(HTML(HTMLContent(
+        HTMLNavigation(os.path.dirname(abs2rel(md_file))),
+        md2html(read_text_file(md_file)),
+        HTMLElem(self._copyright(md_file))))
+        .to_str().encode(ENCODING))
 
-  def send_complete_header(self, ctype):
+  def _send_complete_header(self, ctype):
     self.send_response(200)
     self.send_header("Content-type", ctype)
     self.end_headers()
 
-  def send_404(self):
+  def _send_404(self):
     self.send_error(404, "I'm lost.")
 
   @staticmethod
@@ -194,17 +186,15 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
     return mimetypes.guess_type(path)[0]
 
   @staticmethod
-  def copyright(md_file):
+  def _copyright(md_file):
     if os.path.isabs(CONFIG.copyright):
       copyright_file = os.path.join(DOCUMENT_ROOT, CONFIG.copyright[1:])
     else:
-      copyright_file = os.path.join(os.path.dirname(md_file),
-                                    CONFIG.copyright)
+      copyright_file = os.path.join(os.path.dirname(md_file), CONFIG.copyright)
+
     if os.path.isfile(copyright_file):
-      with open_text_file(copyright_file) as f:
-        return f.read()
-    else:
-      return ""
+      return read_text_file(copyright_file)
+    return ""
 
 
 class HTMLElem:
@@ -322,8 +312,9 @@ def md2html(markdown_text):
                                    use_xhtml=True))
 
 
-def open_text_file(filename, mode="r"):
-  return open(filename, mode=mode, encoding=ENCODING)
+def read_text_file(filename, mode="r"):
+  with open(filename, mode, encoding=ENCODING) as file_:
+    return file_.read()
 
 
 def abs2rel(real_path):
@@ -333,16 +324,13 @@ def abs2rel(real_path):
   return doc_path
 
 
-def get_md_title(md_file):
-  with open_text_file(md_file) as f:
-    # somehow "^# *(.*)$" doesn't work
-    matched_text = re.match("# *(.*)", f.read())
-    if matched_text:
-      return re.match(r"<p>(.*)</p>",
-             md2html(matched_text.group(1)).to_str()).group(1)
-    else:
-      info("get_md_title(): no md title found in {}".format(md_file))
-      return ""
+def get_md_title(filename):
+  matched_text = re.match("# *(.*)", read_text_file(filename))
+  if matched_text:
+    return re.match(r"<p>(.*)</p>",
+                    md2html(matched_text.group(1)).to_str()).group(1)
+  info("get_md_title(): no md title found in {}".format(filename))
+  return ""
 
 
 def get_directory_title(directory):
