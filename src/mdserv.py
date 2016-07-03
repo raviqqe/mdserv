@@ -72,12 +72,7 @@ class Config:
 
   @staticmethod
   def _load_config_file(document_root):
-    config_filename = os.path.join(document_root, CONFIG_FILE)
-    if not os.path.isfile(config_filename):
-      error("configuration file, '{}' not found in document root."
-            .format(config_filename))
-
-    return load_json(config_filename)
+    return load_json(os.path.join(document_root, CONFIG_FILE))
 
   @classmethod
   def _check_key_and_value(cls, key, value):
