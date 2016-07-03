@@ -156,19 +156,19 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
       self._send_404()
 
   def _send_index_file(self, md_file):
-    self.wfile.write(HTML(HTMLContent(
+    self.wfile.write(HTML(
       HTMLNavigation(os.path.dirname(os.path.dirname(abs2rel(md_file)))),
       md2html(read_text_file(md_file)),
       HTMLTableOfContents(os.path.dirname(md_file)),
       HTMLElem(self._copyright(md_file)),
-    )).to_str().encode(ENCODING))
+    ).to_str().encode(ENCODING))
 
   def _send_md_file(self, md_file):
-    self.wfile.write(HTML(HTMLContent(
+    self.wfile.write(HTML(
       HTMLNavigation(os.path.dirname(abs2rel(md_file))),
       md2html(read_text_file(md_file)),
       HTMLElem(self._copyright(md_file))
-    )).to_str().encode(ENCODING))
+    ).to_str().encode(ENCODING))
 
   def _send_complete_header(self, ctype):
     self.send_response(200)
@@ -202,14 +202,6 @@ class HTMLElem:
 
   def to_str(self):
     return self.text
-
-
-class HTMLContent(HTMLElem):
-  def __init__(self, *texts):
-    self.text = ""
-    for text in texts:
-      assert isinstance(text, HTMLElem)
-      self.text += text.to_str()
 
 
 class HTMLTableOfContents(HTMLElem):
@@ -256,8 +248,8 @@ class HTML:
   """
   complete HTML text
   """
-  def __init__(self, content):
-    assert isinstance(content, HTMLContent)
+  def __init__(self, *elems):
+    assert all(isinstance(elem, HTMLElem) for elem in elems)
 
     self.text = '<!DOCTYPE html><html><head>' \
                 '<title>' + CONFIG.title + '</title>' \
@@ -280,7 +272,8 @@ class HTML:
                  '<script src="' + BASE_DIR + 'highlight.min.js"></script>' \
                  '<script>hljs.initHighlightingOnLoad();</script>' \
                  '</head>' \
-                 '<body><div class="markdown-body">' + content.to_str() + \
+                 '<body><div class="markdown-body">' \
+                 + "".join(elem.to_str() for elem in elems) + \
                  '</div></body>' \
                  '</html>'
 
