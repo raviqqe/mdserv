@@ -183,7 +183,7 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
     extension = os.path.splitext(path)[1]
     if extension == MARKDOWN_EXT:
       return "text/html"
-    return mimetypes._guess_type(path)[0]
+    return mimetypes.guess_type(path)[0]
 
   @staticmethod
   def _copyright(md_file):
