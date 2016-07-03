@@ -136,9 +136,9 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
       self.end_headers()
       return
 
-    self.send_reply(real_path)
+    self._send_reply(real_path)
 
-  def send_reply(self, real_path):
+  def _send_reply(self, real_path):
     """
     send HTTP reply.
     """
