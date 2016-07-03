@@ -83,11 +83,11 @@ class Config:
       if key not in self.DEFAULT_CONFIG:
         warn("invalid item, '{}' detected in configuration file, '{}'."
              .format(key, config_filename))
-      elif type(self.DEFAULT_CONFIG[key]) == str \
+      elif isinstance(self.DEFAULT_CONFIG[key], str) \
            and not isinstance(self.config_dict[key], str):
         error("value of item, '{}' in configuration file must be string."
               .format(key))
-      elif type(self.DEFAULT_CONFIG[key]) == list \
+      elif isinstance(self.DEFAULT_CONFIG[key], list) \
            and not self.is_list_of_string(self.config_dict[key]):
         error("value of item, '{}' in configuration file must be a list of "
               "string.".format(key))
@@ -125,9 +125,9 @@ class Config:
 
   @staticmethod
   def is_list_of_string(list_of_string):
-    if type(list_of_string) == list:
+    if isinstance(list_of_string, list):
       for string in list_of_string:
-        if type(string) != str:
+        if not isinstance(string, str):
           return False
       return True
     else:
@@ -233,7 +233,7 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
 
 class HTMLElem:
   def __init__(self, text):
-    assert type(text) == str
+    assert isinstance(text, str)
     self.text = text
 
   def to_str(self):
