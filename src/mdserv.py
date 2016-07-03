@@ -79,32 +79,39 @@ class Config:
 
     return load_json(config_filename)
 
+  @classmethod
+  def _check_key_and_value(cls, key, value):
+    if not isinstance(key, str):
+      error("Keys must be a string.")
+
+    if key not in cls.DEFAULT_CONFIG:
+      error("Invalid key, '{}' detected in configuration file.".format(key))
+
+    real_type = type(cls.DEFAULT_CONFIG[key])
+    if not isinstance(value, real_type):
+      error("Value of key, '{}' in configuration file must be {}."
+            .format(key, real_type.__name__))
+
+    if isinstance(cls.DEFAULT_CONFIG[key], list) \
+       and not is_list_of_string(value):
+      error("value of key, '{}' in configuration file must be a list of "
+            "string.".format(key))
+
   def __init__(self, document_root):
-    self.config_dict = self.DEFAULT_CONFIG
+    self._config_dict = self.DEFAULT_CONFIG
 
     for key, value in self._load_config_file(document_root).items():
-      assert isinstance(key, str)
-      if key not in self.DEFAULT_CONFIG:
-        warn("invalid item, '{}' detected in configuration file, '{}'."
-             .format(key, config_filename))
-      elif isinstance(self.DEFAULT_CONFIG[key], str) \
-           and not isinstance(self.config_dict[key], str):
-        error("value of item, '{}' in configuration file must be string."
-              .format(key))
-      elif isinstance(self.DEFAULT_CONFIG[key], list) \
-           and not is_list_of_string(self.config_dict[key]):
-        error("value of item, '{}' in configuration file must be a list of "
-              "string.".format(key))
-      self.config_dict[key] = value
+      self._check_key_and_value(key, value)
+      self._config_dict[key] = value
 
     self.valid_extensions.append(MARKDOWN_EXT)
 
+    debug("self._config_dict = {}".format(self._config_dict))
     debug(self.valid_absolute_doc_paths)
     debug(self.valid_doc_basenames)
-    debug("self.config_dict = {}".format(self.config_dict))
 
   def __getattr__(self, key):
-    return self.config_dict[key]
+    return self._config_dict[key]
 
   @property
   def _valid_doc_paths(self):
