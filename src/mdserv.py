@@ -99,29 +99,26 @@ class Config:
     else:
       self.config_dict["valid_extensions"].append(MARKDOWN_EXT)
 
-    self.set_valid_paths()
-
-    debug("Config.__init__(): self.config_dict = {}".format(self.config_dict))
+    debug(self.valid_absolute_doc_paths)
+    debug(self.valid_doc_basenames)
+    debug("self.config_dict = {}".format(self.config_dict))
 
   def __getattr__(self, key):
-    assert key in self.config_dict
     return self.config_dict[key]
 
-  def set_valid_paths(self):
-    valid_doc_paths = self.config_dict["css"] \
-                      + [self.config_dict["copyright"],
-                      self.config_dict["icon"],
-                      self.config_dict["phone_icon"]]
+  @property
+  def _valid_doc_paths(self):
+    return self.css + [self.copyright, self.icon, self.phone_icon]
 
-    self.config_dict["valid_absolute_doc_paths"] \
-        = {doc_path for doc_path in valid_doc_paths
-          if doc_path.startswith('/')}
-    self.config_dict["valid_doc_basenames"] \
-        = {doc_path for doc_path in valid_doc_paths
-          if not doc_path.startswith('/')}
+  @property
+  def valid_absolute_doc_paths(self):
+    return {doc_path for doc_path in self._valid_doc_paths
+            if doc_path.startswith('/')}
 
-    debug(self.config_dict["valid_absolute_doc_paths"])
-    debug(self.config_dict["valid_doc_basenames"])
+  @property
+  def valid_doc_basenames(self):
+    return {doc_path for doc_path in self._valid_doc_paths
+            if not doc_path.startswith('/')}
 
 
 class FileHandler(http.server.BaseHTTPRequestHandler):
