@@ -17,6 +17,13 @@ import mimetypes
 
 
 
+CONFIG_FILE = "config.json"
+ENCODING = "utf-8"
+MARKDOWN_EXT = ".md"
+INDEX_FILE = "index" + MARKDOWN_EXT
+
+
+
 # the order of debug
 
 DEBUG = True
@@ -39,24 +46,6 @@ def error(*items):
   exit(1)
 
 
-
-# global constants
-
-CONFIG_FILE = "config.json"
-ENCODING = "utf-8"
-MARKDOWN_EXT = ".md"
-INDEX_FILE = "index" + MARKDOWN_EXT
-
-
-
-# global variables
-
-CONFIG = None # dummy value
-DOCUMENT_ROOT = "/this/is/just/a/dummy/value" # dummy value
-
-
-
-# classes
 
 class Config:
   # every item must be evaluated as False by bool() method
