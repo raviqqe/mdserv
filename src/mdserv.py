@@ -321,8 +321,7 @@ def abs2rel(real_path):
 def get_md_title(filename):
   matched_text = re.match("# *(.*)", read_text_file(filename))
   if matched_text:
-    return re.match(r"<p>(.*)</p>",
-                    md2html(matched_text.group(1)).to_str()).group(1)
+    return matched_text.group(1)
   info("get_md_title(): no md title found in {}".format(filename))
   return ""
 
