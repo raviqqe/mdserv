@@ -159,15 +159,16 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
 
   def _send_index_file(self, md_file):
     self.wfile.write(HTML(
-      HTMLNavigation(os.path.dirname(os.path.dirname(absolute_to_relative_path(md_file)))),
+      Navigation(os.path.dirname(os.path.dirname(
+          absolute_to_relative_path(md_file)))),
       markdown_to_html(read_text_file(md_file)),
-      HTMLTableOfContents(os.path.dirname(md_file)),
+      TableOfContents(os.path.dirname(md_file)),
       HTMLElem(self._copyright(md_file)),
     ).to_str().encode(ENCODING))
 
   def _send_md_file(self, md_file):
     self.wfile.write(HTML(
-      HTMLNavigation(os.path.dirname(absolute_to_relative_path(md_file))),
+      Navigation(os.path.dirname(absolute_to_relative_path(md_file))),
       markdown_to_html(read_text_file(md_file)),
       HTMLElem(self._copyright(md_file))
     ).to_str().encode(ENCODING))
@@ -205,7 +206,7 @@ class HTMLElem:
     return self._text
 
 
-class HTMLTableOfContents(HTMLElem):
+class TableOfContents(HTMLElem):
   def __init__(self, directory):
     assert os.path.isabs(directory)
 
@@ -238,7 +239,7 @@ class HTMLTableOfContents(HTMLElem):
     return '<li><a href="{}">{}</a></li>'.format(href, name)
 
 
-class HTMLNavigation(HTMLElem):
+class Navigation(HTMLElem):
   def __init__(self, parent_directory_path):
     self._text = '<p><a href="{}">back</a></p><hr/>' \
                  .format(parent_directory_path)
