@@ -267,16 +267,18 @@ class HTML:
       self._text += '<link rel="apple-touch-icon" href="{}" type="image/png"/>'\
                     .format(CONFIG.phone_icon)
 
-    BASE_DIR = "//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5"
-    self._text += '<link rel="stylesheet" href="' +  BASE_DIR + \
-                  'styles/default.min.css"/>' \
-                  '<script src="' + BASE_DIR + 'highlight.min.js"></script>' \
-                  '<script>hljs.initHighlightingOnLoad();</script>' \
-                  '</head>' \
+    self._text += self._highlight_js() + '</head>' \
                   '<body><div class="markdown-body">' \
                   + "".join(str(elem) for elem in elems) + \
                   '</div></body>' \
                   '</html>'
+
+  def _highlight_js(self):
+    BASE_DIR = "//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5"
+    return '<link rel="stylesheet" href="' +  BASE_DIR + \
+           'styles/default.min.css"/>' \
+           '<script src="' + BASE_DIR + 'highlight.min.js"></script>' \
+           '<script>hljs.initHighlightingOnLoad();</script>'
 
   def __str__(self):
     return lxml.etree.tostring(lxml.html.fromstring(self._text),
