@@ -158,20 +158,20 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
       self.wfile.write(file_.read())
 
   def _send_index_file(self, md_file):
-    self.wfile.write(HTML(
+    self.wfile.write(str(HTML(
       Navigation(os.path.dirname(os.path.dirname(
           absolute_to_relative_path(md_file)))),
       markdown_to_html(read_text_file(md_file)),
       TableOfContents(os.path.dirname(md_file)),
       HTMLElem(self._copyright(md_file)),
-    ).to_str().encode(ENCODING))
+    )).encode(ENCODING))
 
   def _send_md_file(self, md_file):
-    self.wfile.write(HTML(
+    self.wfile.write(str(HTML(
       Navigation(os.path.dirname(absolute_to_relative_path(md_file))),
       markdown_to_html(read_text_file(md_file)),
       HTMLElem(self._copyright(md_file))
-    ).to_str().encode(ENCODING))
+    )).encode(ENCODING))
 
   def _send_complete_header(self, ctype):
     self.send_response(200)
@@ -202,7 +202,7 @@ class HTMLElem:
     assert isinstance(text, str)
     self._text = text
 
-  def to_str(self):
+  def __str__(self):
     return self._text
 
 
@@ -274,11 +274,11 @@ class HTML:
                   '<script>hljs.initHighlightingOnLoad();</script>' \
                   '</head>' \
                   '<body><div class="markdown-body">' \
-                  + "".join(elem.to_str() for elem in elems) + \
+                  + "".join(str(elem) for elem in elems) + \
                   '</div></body>' \
                   '</html>'
 
-  def to_str(self):
+  def __str__(self):
     return lxml.etree.tostring(lxml.html.fromstring(self._text),
                                encoding=ENCODING,
                                doctype="<!DOCTYPE html>",
