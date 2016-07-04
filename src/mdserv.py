@@ -137,7 +137,7 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
 
   def _send_reply(self, real_path):
     assert os.path.isabs(real_path)
-    assert is_safe_doc_path(abs2rel(real_path))
+    assert is_safe_doc_path(absolute_to_relative_path(real_path))
 
     index_file = os.path.join(real_path, INDEX_FILE)
 
@@ -159,16 +159,16 @@ class FileHandler(http.server.BaseHTTPRequestHandler):
 
   def _send_index_file(self, md_file):
     self.wfile.write(HTML(
-      HTMLNavigation(os.path.dirname(os.path.dirname(abs2rel(md_file)))),
-      md2html(read_text_file(md_file)),
+      HTMLNavigation(os.path.dirname(os.path.dirname(absolute_to_relative_path(md_file)))),
+      markdown_to_html(read_text_file(md_file)),
       HTMLTableOfContents(os.path.dirname(md_file)),
       HTMLElem(self._copyright(md_file)),
     ).to_str().encode(ENCODING))
 
   def _send_md_file(self, md_file):
     self.wfile.write(HTML(
-      HTMLNavigation(os.path.dirname(abs2rel(md_file))),
-      md2html(read_text_file(md_file)),
+      HTMLNavigation(os.path.dirname(absolute_to_relative_path(md_file))),
+      markdown_to_html(read_text_file(md_file)),
       HTMLElem(self._copyright(md_file))
     ).to_str().encode(ENCODING))
 
@@ -214,21 +214,21 @@ class HTMLTableOfContents(HTMLElem):
     for absolute_path in [os.path.join(directory, path)
                           for path in os.listdir(directory)
                           if not re.match(re.escape(INDEX_FILE), path)]:
-      if not is_hidden_doc_path(abs2rel(absolute_path)) \
+      if not is_hidden_doc_path(absolute_to_relative_path(absolute_path)) \
          and not (os.path.isdir(absolute_path)
                   and not os.path.isfile(os.path.join(absolute_path,
                                                       INDEX_FILE))):
         if is_markdown_file(absolute_path) and os.path.isfile(absolute_path):
           self._text += self.anchor_in_list_elem(
-              abs2rel(absolute_path),
+              absolute_to_relative_path(absolute_path),
               get_md_title(absolute_path) or os.path.basename(absolute_path))
         elif os.path.isdir(absolute_path):
           self._text += self.anchor_in_list_elem(
-              abs2rel(absolute_path),
+              absolute_to_relative_path(absolute_path),
               get_directory_title(absolute_path))
         else:
           self._text += self.anchor_in_list_elem(
-              abs2rel(absolute_path),
+              absolute_to_relative_path(absolute_path),
               os.path.basename(absolute_path))
 
     self._text += "</ul>"
@@ -296,7 +296,7 @@ def file_extension(filename):
   return os.path.splitext(filename)[1]
 
 
-def md2html(markdown_text):
+def markdown_to_html(markdown_text):
   return HTMLElem(mistune.markdown(markdown_text, escape=True, use_xhtml=True))
 
 
@@ -305,10 +305,10 @@ def read_text_file(filename, mode="r"):
     return file_.read()
 
 
-def abs2rel(real_path):
-  debug("abs2rel(): real_path =", real_path)
+def absolute_to_relative_path(real_path):
+  debug("absolute_to_relative_path(): real_path =", real_path)
   doc_path = '/' + os.path.relpath(real_path, DOCUMENT_ROOT)
-  debug("abs2rel(): doc_path =", doc_path)
+  debug("absolute_to_relative_path(): doc_path =", doc_path)
   return doc_path
 
 
