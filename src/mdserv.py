@@ -413,15 +413,14 @@ def get_args():
 
 
 def main():
-  global CONFIG
-  global DOCUMENT_ROOT
-
   args = get_args()
 
+  global DOCUMENT_ROOT
   DOCUMENT_ROOT = os.path.realpath(args.document_root)
-  CONFIG = Config(DOCUMENT_ROOT)
-
   debug("DOCUMENT_ROOT =", DOCUMENT_ROOT)
+
+  global CONFIG
+  CONFIG = Config(DOCUMENT_ROOT)
 
   serve(args.port)
 
