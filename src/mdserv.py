@@ -313,9 +313,9 @@ def abs2rel(real_path):
 
 
 def get_md_title(filename):
-  matched_text = re.match("# *(.*)", read_text_file(filename))
-  if matched_text:
-    return matched_text.group(1)
+  match = re.match("# *(.*)", read_text_file(filename))
+  if match:
+    return match.group(1)
   info("get_md_title(): no md title found in {}".format(filename))
   return ""
 
