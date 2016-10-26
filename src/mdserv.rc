@@ -7,7 +7,6 @@
 # KEYWORD: shutdown
 
 # Add the following to /etc/rc.conf[.local]
-# ($mdserv_args is not used)
 #
 # required variables:
 # mdserv_enable="YES"
